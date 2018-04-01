@@ -46,17 +46,48 @@ def select_location_business(driver, location_input='07030', business_type='Rest
 
 driver = select_location_business(driver, '07030', 'Restaurant')
 
-#def restaur_hoboken(data_element):
-#for rows in data_element:
+laund_popup = """//*[@id="super-container"]/div/div[4]/div/div/div[2]/a"""
+select_popup = driver.find_element_by_xpath(laund_popup)
+click_laund_popup = select_popup.click()
 
-#Select restaurant
+def select_back_all_re(driver, restaurant_no, ad_no):
+    global restaurant_xpath_li, select_business, click_business
+    restaurant_no = 10
+    ad_no = 0
+    restaurant_xpath_li = []
+    for i in range(restaurant_no):
+        no = str(i + 1 + ad_no)
+        re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
+        re_xpath = re_xpath.format(no)
+        restaurant_xpath_li.append(re_xpath)
+    for i in range(len(restaurant_xpath_li)):
+        normal_delay = random.normalvariate(3, 0.5)
+        time.sleep(normal_delay)
+        select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
+        click_business = select_business.click()
 
-search_header_bar = driver.find_element_by_class_name('regular-search-result')
-rest_header_bar = search_header_bar.find_element_by_class_name('media-story')
-rest_line_items = rest_header_bar.find_element_by_tag_name('a')
-rest_line_items.click()
 
-wait = WebDriverWait(driver, 10)
 
-driver.back()
+        ###after you add above function, please delete following codes
+        normal_delay = random.normalvariate(5, 0.5)
+        time.sleep(normal_delay)
+        driver.back()
+        ###
+
+    def click_next_page_review():
+        next_page = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/div[1]/div/div/div[2]/div/div[10]/a/span[1]"""
+        select_next_page = driver.find_element_by_xpath(next_page)
+        click_next_page = select_next_page.click()
+
+    return driver
+
+select_back_all_re(driver, 10, 0)
+
+
+
+#def extract_data():
+
+
+#def store_data():
+
 
