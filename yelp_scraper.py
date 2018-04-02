@@ -66,7 +66,11 @@ def select_back_all_re(driver, restaurant_no, ad_no):
         select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
         click_business = select_business.click()
 
-
+        #Extract Data
+        rest_page = """//*[@id="wrap"]/div[2]/div"""
+        data_div = driver.find_element_by_xpath(rest_page)
+        data_html = data_div.get_attribute('innerHTML')
+        soup = bs4.BeautifulSoup(data_html, 'html5lib')
 
         ###after you add above function, please delete following codes
         normal_delay = random.normalvariate(5, 0.5)
@@ -87,7 +91,12 @@ select_back_all_re(driver, 10, 0)
 
 #def extract_data():
 
+    #rest_page = """//*[@id="wrap"]/div[2]/div"""
+    #data_div = driver.find_element_by_xpath(rest_page)
+    #data_html = data_div.get_attribute('innerHTML')
+    #soup = bs4.BeautifulSoup(data_html, 'html5lib')
+
+    #print(soup)
 
 #def store_data():
-
 
