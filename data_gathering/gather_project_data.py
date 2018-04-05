@@ -140,10 +140,9 @@ def detect_ad_no(driver):
     return ad_no
 
 def select_back_all_re(driver):
+    global reviews_df
     restaurant_xpath_li = []
-    res_profile_li = []
     ad_no = detect_ad_no(driver)
-    id_df = extract_id_df(driver)
     for i in range(70):
         try:
             for i in range(10):
@@ -159,7 +158,7 @@ def select_back_all_re(driver):
                 click_business = select_business.click()
                 res_li = extract_restaurant_li(driver)
                 count = 1
-                #next_page
+                reviews_df = None
                 reviews_df = extract_reviews_df(driver)
 
                 for i in range(50):
@@ -173,7 +172,6 @@ def select_back_all_re(driver):
                         count += 1
                     except:
                         pass
-                res_li = extract_restaurant_li(driver)
                 reviews_df['restaurant_name'] = res_li[0]
                 reviews_df['restaurant_rating'] = res_li[1]
                 reviews_df['restaurant_price'] = res_li[2]
@@ -182,7 +180,7 @@ def select_back_all_re(driver):
                 df = reviews_df
                 df.to_csv(file_name)
 
-                reviews_df = None
+
                 back_page_no = "window.history.go({})".format(str(-count))
                 driver.execute_script(back_page_no)
             next_button = driver.find_element_by_link_text("""Next""")
@@ -194,7 +192,7 @@ def select_back_all_re(driver):
 def main():
     driver = open_website('https://www.yelp.com/')
     driver = select_location_business(driver, '07030', 'Restaurant')
-    driver = select_back_all_re(driver)
+    select_back_all_re(driver)
     return None
 
 if __name__ == '__main__':
