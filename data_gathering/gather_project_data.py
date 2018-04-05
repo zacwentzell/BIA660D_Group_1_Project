@@ -58,35 +58,37 @@ def extract_id_df(driver):
 
 def extract_restaurant_li(driver):
     global data_element
-    # res_name
+    #res_name
     restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
     data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html, 'html5lib')
-    restaurant_name_element = soup.find('h1', attrs={'class': "biz-page-title embossed-text-white shortenough"})
-    restaurant_name = restaurant_name_element.text
+    soup = bs4.BeautifulSoup(data_html,'html5lib')
+    restaurant_name_element = soup.find('h1', attrs={'class':"biz-page-title"})
+    restaurant_name = restaurant_name_element.text.split()
+    restaurant_name = ' '.join(restaurant_name)
 
-    # res_rating
+    #res_rating
     restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
     data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html, 'html5lib')
-    restaurant_rating_tag = soup.find('div', attrs={'class': "i-stars"}).attrs
+    soup = bs4.BeautifulSoup(data_html,'html5lib')
+    restaurant_rating_tag = soup.find('div', attrs={'class':"i-stars"}).attrs
     restaurant_rating = restaurant_rating_tag['title']
 
-    # res_price
+    #res_price
     restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
     data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html, 'html5lib')
-    restaurant_price_element = soup.find('span', attrs={'class': "business-attribute price-range"})
+    soup = bs4.BeautifulSoup(data_html,'html5lib')
+    restaurant_price_element = soup.find('span',attrs={'class':"business-attribute"})
     restaurant_price = restaurant_price_element.text
 
-    # res_tag
+    #res_tag
     restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
     data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html, 'html5lib')
-    restaurant_tag_element = soup.find('span', attrs={'class': "category-str-list"})
-    restaurant_tag = restaurant_tag_element.text
+    soup = bs4.BeautifulSoup(data_html,'html5lib')
+    restaurant_tag_element = soup.find('span', attrs = {'class':"category-str-list"})
+    restaurant_tag = restaurant_tag_element.text.split()
+    restaurant_tag = ', '.join(restaurant_tag)
 
-    li = [restaurant_name, restaurant_rating, restaurant_price, restaurant_tag]
+    li = [restaurant_name, restaurant_rating,restaurant_price,restaurant_tag]
     return li
 
 
@@ -139,54 +141,53 @@ def detect_ad_no(driver):
         ad_no = 0
     return ad_no
 
+
 def select_back_all_re(driver):
-    global reviews_df
+    global reviews_df, count
     restaurant_xpath_li = []
+    res_profile_li = []
     ad_no = detect_ad_no(driver)
     for i in range(70):
-        try:
-            for i in range(10):
-                no = str(i+1+ad_no)
-                re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
-                re_xpath = re_xpath.format(no)
-                restaurant_xpath_li.append(re_xpath)
+        for i in range(10):
+            no = str(i + 1 + ad_no)
+            re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
+            re_xpath = re_xpath.format(no)
+            restaurant_xpath_li.append(re_xpath)
 
-            for i in range(len(restaurant_xpath_li)):
-                normal_delay = random.normalvariate(3, 0.5)
-                time.sleep(normal_delay)
-                select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
-                click_business = select_business.click()
-                res_li = extract_restaurant_li(driver)
-                count = 1
-                reviews_df = None
-                reviews_df = extract_reviews_df(driver)
+        for i in range(len(restaurant_xpath_li)):
+            normal_delay = random.normalvariate(2, 0.5)
+            time.sleep(normal_delay)
+            select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
+            click_business = select_business.click()
 
-                for i in range(50):
-                    try:
-                        next_button = driver.find_element_by_link_text("""Next""")
-                        next_button.click()
-                        reviews_df_more = extract_reviews_df(driver)
-                        reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index = True)
-                        normal_delay = random.normalvariate(5, 0.5)
-                        time.sleep(normal_delay)
-                        count += 1
-                    except:
-                        pass
-                reviews_df['restaurant_name'] = res_li[0]
-                reviews_df['restaurant_rating'] = res_li[1]
-                reviews_df['restaurant_price'] = res_li[2]
-                reviews_df['restaurant_type'] = res_li[3]
-                file_name = str(res_li[0])+('.csv')
-                df = reviews_df
-                df.to_csv(file_name)
+            res_li = extract_restaurant_li(driver)
+            reviews_df = None
+            reviews_df = extract_reviews_df(driver)
+            count = 1
+            for i in range(200):
+                try:
+                    next_button = driver.find_element_by_link_text("""Next""")
+                    next_button.click()
+                    reviews_df_more = extract_reviews_df(driver)
+                    reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index=True)
+                    normal_delay = random.normalvariate(2, 0.5)
+                    time.sleep(normal_delay)
+                    count += 1
+                except:
+                    pass
+            res_li = extract_restaurant_li(driver)
+            reviews_df['restaurant_name'] = res_li[0]
+            reviews_df['restaurant_rating'] = res_li[1]
+            reviews_df['restaurant_price'] = res_li[2]
+            reviews_df['restaurant_type'] = res_li[3]
+            file_name = str(res_li[0]) + ('.csv')
+            df = reviews_df
+            df.to_csv(file_name)
 
-
-                back_page_no = "window.history.go({})".format(str(-count))
-                driver.execute_script(back_page_no)
-            next_button = driver.find_element_by_link_text("""Next""")
-            next_button.click()
-        except:
-            pass
+            back_page_no = "window.history.go({})".format(str(-count))
+            driver.execute_script(back_page_no)
+        next_button = driver.find_element_by_link_text("""Next""")
+        next_button.click()
     return driver
 
 def main():
