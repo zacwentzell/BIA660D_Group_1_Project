@@ -1,10 +1,7 @@
 from selenium import webdriver
-from selenium.webdriver.support.select import Select
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.keys import Keys
 import random
 import time
 import bs4
@@ -13,7 +10,9 @@ import sys
 import os
 import warnings
 warnings.filterwarnings("ignore")
-
+def create_file(file_name):
+    os.mkdir(file_name)
+    return None
 
 def open_website(URL='https://www.yelp.com/'):
     driver = webdriver.Chrome(executable_path='./chromedriver')
@@ -174,8 +173,9 @@ def select_back_all_re(driver):
             reviews_df['restaurant_price'] = res_li[2]
             reviews_df['restaurant_type'] = res_li[3]
             file_name = str(res_li[0])+('.csv')
+            path = """.\Hoboken_Restaurant_Reviews"""
             df = reviews_df
-            df.to_csv(file_name)
+            df.to_csv(path, file_name)
 
             reviews_df = None
             back_page_no = "window.history.go({})".format(str(-count))
@@ -184,7 +184,8 @@ def select_back_all_re(driver):
         next_button.click()
     return driver
 
-def main(driver):
+def main():
+    create_file("""Hoboken_Restaurant_Reviews""")
     driver = open_website('https://www.yelp.com/')
     driver = select_location_business(driver, '07030', 'Restaurant')
     driver = select_back_all_re(driver)
