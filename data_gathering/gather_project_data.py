@@ -6,8 +6,6 @@ import random
 import time
 import bs4
 import pandas as pd
-import sys
-import os
 import warnings
 warnings.filterwarnings("ignore")
 def create_file(file_name):
@@ -34,10 +32,11 @@ def select_location_business(driver, location_input='07030', business_type='Rest
     hit_search.click()
     return driver
 
-def extract_id_df(driver, ad_no):
+def extract_id_df(driver):
     restaurant_id_xpath_li = []
     restaurant_id_li = []
     restaurant_name_li = []
+    ad_no = detect_ad_no(driver)
     for i in range(10):
         no = str(i+1+ad_no)
         id_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span"""
@@ -128,7 +127,7 @@ def detect_ad_no(driver):
         data_element = driver.find_element_by_xpath("""//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]""")
         data_html = data_element.get_attribute('innerHTML')
         soup = bs4.BeautifulSoup(data_html,'html5lib')
-        ad_list = soup.find_all('li', attrs={'class': 'js-yloca js-yloca-search yloca-search-result'})
+        ad_list = soup.find_all('li', attrs={'class': 'js-yloca js-yloca-search yloca-search-result', "data-ad-placement":"above_search"})
         ad_no = len(ad_list)
     except:
         ad_no = 0
@@ -138,54 +137,55 @@ def select_back_all_re(driver):
     restaurant_xpath_li = []
     res_profile_li = []
     ad_no = detect_ad_no(driver)
-    id_df = extract_id_df(driver, ad_no)
+    id_df = extract_id_df(driver)
     for i in range(70):
-        for i in range(10):
-            no = str(i+1+ad_no)
-            re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
-            re_xpath = re_xpath.format(no)
-            restaurant_xpath_li.append(re_xpath)
+        try:
+            for i in range(10):
+                no = str(i+1+ad_no)
+                re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
+                re_xpath = re_xpath.format(no)
+                restaurant_xpath_li.append(re_xpath)
 
-        for i in range(len(restaurant_xpath_li)):
-            normal_delay = random.normalvariate(3, 0.5)
-            time.sleep(normal_delay)
-            select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
-            click_business = select_business.click()
-            res_li = extract_restaurant_li(driver)
-            count = 1
-            #next_page
-            reviews_df = extract_reviews_df(driver)
+            for i in range(len(restaurant_xpath_li)):
+                normal_delay = random.normalvariate(3, 0.5)
+                time.sleep(normal_delay)
+                select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
+                click_business = select_business.click()
+                res_li = extract_restaurant_li(driver)
+                count = 1
+                #next_page
+                reviews_df = extract_reviews_df(driver)
 
-            for i in range(50):
-                try:
-                    next_button = driver.find_element_by_link_text("""Next""")
-                    next_button.click()
-                    reviews_df_more = extract_reviews_df(driver)
-                    reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index = True)
-                    normal_delay = random.normalvariate(5, 0.5)
-                    time.sleep(normal_delay)
-                    count += 1
-                except:
-                    pass
-            res_li = extract_restaurant_li(driver)
-            reviews_df['restaurant_name'] = res_li[0]
-            reviews_df['restaurant_rating'] = res_li[1]
-            reviews_df['restaurant_price'] = res_li[2]
-            reviews_df['restaurant_type'] = res_li[3]
-            file_name = str(res_li[0])+('.csv')
-            path = """.\Hoboken_Restaurant_Reviews"""
-            df = reviews_df
-            df.to_csv(path, file_name)
+                for i in range(50):
+                    try:
+                        next_button = driver.find_element_by_link_text("""Next""")
+                        next_button.click()
+                        reviews_df_more = extract_reviews_df(driver)
+                        reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index = True)
+                        normal_delay = random.normalvariate(5, 0.5)
+                        time.sleep(normal_delay)
+                        count += 1
+                    except:
+                        pass
+                res_li = extract_restaurant_li(driver)
+                reviews_df['restaurant_name'] = res_li[0]
+                reviews_df['restaurant_rating'] = res_li[1]
+                reviews_df['restaurant_price'] = res_li[2]
+                reviews_df['restaurant_type'] = res_li[3]
+                file_name = str(res_li[0])+('.csv')
+                df = reviews_df
+                df.to_csv(file_name)
 
-            reviews_df = None
-            back_page_no = "window.history.go({})".format(str(-count))
-            driver.execute_script(back_page_no)
-        next_button = driver.find_element_by_link_text("""Next""")
-        next_button.click()
+                reviews_df = None
+                back_page_no = "window.history.go({})".format(str(-count))
+                driver.execute_script(back_page_no)
+            next_button = driver.find_element_by_link_text("""Next""")
+            next_button.click()
+        except:
+            pass
     return driver
 
 def main():
-    create_file("""Hoboken_Restaurant_Reviews""")
     driver = open_website('https://www.yelp.com/')
     driver = select_location_business(driver, '07030', 'Restaurant')
     driver = select_back_all_re(driver)
