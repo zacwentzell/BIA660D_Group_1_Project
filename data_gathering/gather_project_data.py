@@ -145,7 +145,6 @@ def detect_ad_no(driver):
 def select_back_all_re(driver):
     global reviews_df, count
     restaurant_xpath_li = []
-    res_profile_li = []
     ad_no = detect_ad_no(driver)
     for i in range(70):
         for i in range(10):
