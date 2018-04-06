@@ -141,11 +141,10 @@ def detect_ad_no(driver):
         ad_no = 0
     return ad_no
 
-
+error_li = []
 def select_back_all_re(driver):
-    global reviews_df, count
+    global reviews_df, count, error_li
     restaurant_xpath_li = []
-    res_profile_li = []
     for i in range(70):
         ad_no = detect_ad_no(driver)
         for i in range(10):
@@ -163,7 +162,6 @@ def select_back_all_re(driver):
             reviews_df = None
             reviews_df = extract_reviews_df(driver)
             count = 1
-            error_li = []
             for i in range(48):
                 try:
                     next_button = driver.find_element_by_link_text("""Next""")
@@ -175,7 +173,6 @@ def select_back_all_re(driver):
                     count += 1
                 except:
                     pass
-            res_li = extract_restaurant_li(driver)
             reviews_df['restaurant_name'] = res_li[0]
             reviews_df['restaurant_rating'] = res_li[1]
             reviews_df['restaurant_price'] = res_li[2]
