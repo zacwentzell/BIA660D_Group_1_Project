@@ -145,8 +145,9 @@ def detect_ad_no(driver):
 def select_back_all_re(driver):
     global reviews_df, count
     restaurant_xpath_li = []
-    ad_no = detect_ad_no(driver)
+    res_profile_li = []
     for i in range(70):
+        ad_no = detect_ad_no(driver)
         for i in range(10):
             no = str(i + 1 + ad_no)
             re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
@@ -158,12 +159,12 @@ def select_back_all_re(driver):
             time.sleep(normal_delay)
             select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
             click_business = select_business.click()
-
             res_li = extract_restaurant_li(driver)
             reviews_df = None
             reviews_df = extract_reviews_df(driver)
             count = 1
-            for i in range(200):
+            error_li = []
+            for i in range(48):
                 try:
                     next_button = driver.find_element_by_link_text("""Next""")
                     next_button.click()
@@ -182,17 +183,22 @@ def select_back_all_re(driver):
             file_name = str(res_li[0]) + ('.csv')
             df = reviews_df
             df.to_csv(file_name)
-
+            if count == 49:
+                error_li.append(res_li[0])
+                print('Pages out of range {}'.format(res_li[0]))
             back_page_no = "window.history.go({})".format(str(-count))
             driver.execute_script(back_page_no)
+
         next_button = driver.find_element_by_link_text("""Next""")
         next_button.click()
-    return driver
+    return [driver, error_li]
 
 def main():
     driver = open_website('https://www.yelp.com/')
     driver = select_location_business(driver, '07030', 'Restaurant')
-    select_back_all_re(driver)
+    driver_li = select_back_all_re(driver)
+    driver = driver_li[0]
+    error_li = driver_li[1]
     return None
 
 if __name__ == '__main__':
