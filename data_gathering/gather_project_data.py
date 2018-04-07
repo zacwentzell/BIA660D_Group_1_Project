@@ -7,6 +7,7 @@ import time
 import bs4
 import pandas as pd
 import warnings
+import os
 warnings.filterwarnings("ignore")
 
 error_li = []
