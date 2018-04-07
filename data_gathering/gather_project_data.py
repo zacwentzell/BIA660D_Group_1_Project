@@ -9,12 +9,12 @@ import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
 
+error_li = []
 
 def open_website(URL='https://www.yelp.com/'):
     driver = webdriver.Chrome(executable_path='./chromedriver')
     driver.get(URL)
     return driver
-
 
 def select_location_business(driver, location_input='07030', business_type='Restaurant'):
     normal_delay = random.normalvariate(2, 0.5)
@@ -55,9 +55,7 @@ def extract_id_df(driver):
 
     return df
 
-
 def extract_restaurant_li(driver):
-    global data_element
     # res_name
     restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
     data_html = restaurant_header_element.get_attribute('innerHTML')
@@ -67,7 +65,6 @@ def extract_restaurant_li(driver):
     restaurant_name = ' '.join(restaurant_name)
 
     try:
-
         # res_rating
         restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
         data_html = restaurant_header_element.get_attribute('innerHTML')
@@ -96,11 +93,10 @@ def extract_restaurant_li(driver):
         restaurant_tag = restaurant_tag_element.text.split()
         restaurant_tag = ', '.join(restaurant_tag)
     except:
-        restaurant_price = None
+        restaurant_tag = None
 
     li = [restaurant_name, restaurant_rating, restaurant_price, restaurant_tag]
     return li
-
 
 def extract_reviews_df(driver):
     name_li = []
@@ -150,9 +146,6 @@ def detect_ad_no(driver):
     except:
         ad_no = 0
     return ad_no
-
-error_li = []
-
 
 def select_back_all_re(driver):
     global reviews_df, count, error_li
@@ -244,7 +237,6 @@ def fix_error(error_li):
         df.to_csv(file_name)
         driver.close()
     return None
-
 
 def main():
     global error_li
