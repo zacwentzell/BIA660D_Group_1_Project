@@ -8,9 +8,7 @@ import bs4
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
-def create_file(file_name):
-    os.mkdir(file_name)
-    return None
+
 
 def open_website(URL='https://www.yelp.com/'):
     driver = webdriver.Chrome(executable_path='./chromedriver')
@@ -21,22 +19,23 @@ def open_website(URL='https://www.yelp.com/'):
 def select_location_business(driver, location_input='07030', business_type='Restaurant'):
     normal_delay = random.normalvariate(2, 0.5)
     time.sleep(normal_delay)
-    active_location_search_input = driver.find_element_by_id("dropperText_Mast")
 
+    active_location_search_input = driver.find_element_by_id("dropperText_Mast")
     active_location_search_input.clear()
     active_location_search_input.send_keys(location_input)
-    wait = WebDriverWait(driver, 10)  # step 1
-    active_business_search_input = wait.until(EC.element_to_be_clickable((By.ID, "find_desc")))  # step 2
+
+    wait = WebDriverWait(driver, 10)
+    active_business_search_input = wait.until(EC.element_to_be_clickable((By.ID, "find_desc")))
     active_business_search_input.send_keys(business_type)
     hit_search = driver.find_element_by_id("header-search-submit")
-    hit_search.click()
+    search_result = hit_search.click()
     return driver
 
 def extract_id_df(driver):
+    ad_no  = detect_ad_no(driver)
     restaurant_id_xpath_li = []
     restaurant_id_li = []
     restaurant_name_li = []
-    ad_no = detect_ad_no(driver)
     for i in range(10):
         no = str(i+1+ad_no)
         id_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span"""
@@ -53,8 +52,8 @@ def extract_id_df(driver):
         restaurant_name = soup.find('a').text
         restaurant_name_li.append(restaurant_name)
     df = pd.DataFrame(data = {'restaurant_id' : restaurant_id_li, 'restaurant_name':restaurant_name_li})
-    return df
 
+    return df
 
 def extract_restaurant_li(driver):
     global data_element
@@ -142,10 +141,12 @@ def detect_ad_no(driver):
     return ad_no
 
 error_li = []
+
+
 def select_back_all_re(driver):
     global reviews_df, count, error_li
     restaurant_xpath_li = []
-    for i in range(70):
+    for i in range(69):
         ad_no = detect_ad_no(driver)
         for i in range(10):
             no = str(i + 1 + ad_no)
@@ -173,6 +174,7 @@ def select_back_all_re(driver):
                     count += 1
                 except:
                     pass
+            res_li = extract_restaurant_li(driver)
             reviews_df['restaurant_name'] = res_li[0]
             reviews_df['restaurant_rating'] = res_li[1]
             reviews_df['restaurant_price'] = res_li[2]
@@ -181,21 +183,64 @@ def select_back_all_re(driver):
             df = reviews_df
             df.to_csv(file_name)
             if count == 49:
-                error_li.append(res_li[0])
-                print('Pages out of range {}'.format(res_li[0]))
+                if res_li[0] not in error_li:
+                    error_li.append(res_li[0])
+                    print('Pages out of range {}'.format(res_li[0]))
             back_page_no = "window.history.go({})".format(str(-count))
             driver.execute_script(back_page_no)
 
         next_button = driver.find_element_by_link_text("""Next""")
         next_button.click()
-    return [driver, error_li]
+    return driver
+
+def fix_error(error_li):
+    global reviews_df, res_li
+    for error_restaurant in error_li:
+        driver = open_website('https://www.yelp.com/')
+        res_li = []
+        driver = select_location_business(driver, '07030', error_restaurant)
+        ad_no = detect_ad_no(driver)
+        no = str(1+ad_no)
+        re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
+        re_xpath = re_xpath.format(no)
+        normal_delay = random.normalvariate(2, 0.5)
+        time.sleep(normal_delay)
+        select_business = driver.find_element_by_xpath(re_xpath)
+        select_business.click()
+
+        res_li = extract_restaurant_li(driver)
+        reviews_df = None
+        reviews_df = extract_reviews_df(driver)
+        count = 1
+        for i in range(999):
+            try:
+                next_button = driver.find_element_by_link_text("""Next""")
+                next_button.click()
+                reviews_df_more = extract_reviews_df(driver)
+                reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index = True)
+                normal_delay = random.normalvariate(2, 0.5)
+                time.sleep(normal_delay)
+                count += 1
+            except:
+                pass
+        res_li = extract_restaurant_li(driver)
+        reviews_df['restaurant_name'] = res_li[0]
+        reviews_df['restaurant_rating'] = res_li[1]
+        reviews_df['restaurant_price'] = res_li[2]
+        reviews_df['restaurant_type'] = res_li[3]
+        file_name = str(res_li[0])+('.csv')
+        df = reviews_df
+        df.to_csv(file_name)
+        driver.close()
+    return None
+
 
 def main():
+    global error_li
     driver = open_website('https://www.yelp.com/')
     driver = select_location_business(driver, '07030', 'Restaurant')
-    driver_li = select_back_all_re(driver)
-    driver = driver_li[0]
-    error_li = driver_li[1]
+    select_back_all_re(driver)
+    fix_error(error_li)
     return None
 
 if __name__ == '__main__':
