@@ -55,39 +55,50 @@ def extract_id_df(driver):
 
     return df
 
+
 def extract_restaurant_li(driver):
     global data_element
-    #res_name
+    # res_name
     restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
     data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html,'html5lib')
-    restaurant_name_element = soup.find('h1', attrs={'class':"biz-page-title"})
+    soup = bs4.BeautifulSoup(data_html, 'html5lib')
+    restaurant_name_element = soup.find('h1', attrs={'class': "biz-page-title"})
     restaurant_name = restaurant_name_element.text.split()
     restaurant_name = ' '.join(restaurant_name)
 
-    #res_rating
-    restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
-    data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html,'html5lib')
-    restaurant_rating_tag = soup.find('div', attrs={'class':"i-stars"}).attrs
-    restaurant_rating = restaurant_rating_tag['title']
+    try:
 
-    #res_price
-    restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
-    data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html,'html5lib')
-    restaurant_price_element = soup.find('span',attrs={'class':"business-attribute"})
-    restaurant_price = restaurant_price_element.text
+        # res_rating
+        restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
+        data_html = restaurant_header_element.get_attribute('innerHTML')
+        soup = bs4.BeautifulSoup(data_html, 'html5lib')
+        restaurant_rating_tag = soup.find('div', attrs={'class': "i-stars"}).attrs
+        restaurant_rating = restaurant_rating_tag['title']
+    except:
+        restaurant_rating = None
 
-    #res_tag
-    restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
-    data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html,'html5lib')
-    restaurant_tag_element = soup.find('span', attrs = {'class':"category-str-list"})
-    restaurant_tag = restaurant_tag_element.text.split()
-    restaurant_tag = ', '.join(restaurant_tag)
+    try:
+        # res_price
+        restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
+        data_html = restaurant_header_element.get_attribute('innerHTML')
+        soup = bs4.BeautifulSoup(data_html, 'html5lib')
+        restaurant_price_element = soup.find('span', attrs={'class': "business-attribute"})
+        restaurant_price = restaurant_price_element.text
+    except:
+        restaurant_price = None
 
-    li = [restaurant_name, restaurant_rating,restaurant_price,restaurant_tag]
+    try:
+        # res_tag
+        restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
+        data_html = restaurant_header_element.get_attribute('innerHTML')
+        soup = bs4.BeautifulSoup(data_html, 'html5lib')
+        restaurant_tag_element = soup.find('span', attrs={'class': "category-str-list"})
+        restaurant_tag = restaurant_tag_element.text.split()
+        restaurant_tag = ', '.join(restaurant_tag)
+    except:
+        restaurant_price = None
+
+    li = [restaurant_name, restaurant_rating, restaurant_price, restaurant_tag]
     return li
 
 
