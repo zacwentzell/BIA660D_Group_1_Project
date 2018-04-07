@@ -184,7 +184,7 @@ def select_back_all_re(driver):
     global reviews_df, count, error_li, ad_no, res_li
 
     restaurant_xpath_li = []
-    for i in range(50):
+    for i in range(70):
         for i in range(10):
             ad_no = None
             ad_no = detect_ad_no(driver)
@@ -208,7 +208,6 @@ def select_back_all_re(driver):
     return driver
 
 
-
 def fix_error(error_li):
     global reviews_df, res_li
     for error_restaurant in error_li:
@@ -216,7 +215,7 @@ def fix_error(error_li):
         res_li = []
         driver = select_location_business(driver, '07030', error_restaurant)
         ad_no = detect_ad_no(driver)
-        no = str(1+ad_no)
+        no = str(1 + ad_no)
         re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
         re_xpath = re_xpath.format(no)
         normal_delay = random.normalvariate(2, 0.5)
@@ -228,12 +227,12 @@ def fix_error(error_li):
         reviews_df = None
         reviews_df = extract_reviews_df(driver)
         count = 1
-        for i in range(999):
+        for i in range(222):
             try:
                 next_button = driver.find_element_by_link_text("""Next""")
                 next_button.click()
                 reviews_df_more = extract_reviews_df(driver)
-                reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index = True)
+                reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index=True)
                 normal_delay = random.normalvariate(2, 0.5)
                 time.sleep(normal_delay)
                 count += 1
@@ -244,9 +243,11 @@ def fix_error(error_li):
         reviews_df['restaurant_rating'] = res_li[1]
         reviews_df['restaurant_price'] = res_li[2]
         reviews_df['restaurant_type'] = res_li[3]
-        file_name = str(res_li[0])+('.csv')
+        file_name = str(res_li[0]) + ('.csv')
         df = reviews_df
         df.to_csv(file_name)
+        normal_delay = random.normalvariate(2, 0.5)
+        time.sleep(normal_delay)
         driver.close()
     return None
 
