@@ -147,10 +147,13 @@ def detect_ad_no(driver):
         ad_no = 0
     return ad_no
 
+
 def select_back_all_re(driver):
-    global reviews_df, count, error_li
+    global reviews_df, count, error_li, ad_no, res_li
+
     restaurant_xpath_li = []
-    for i in range(69):
+    for i in range(50):
+        ad_no = None
         ad_no = detect_ad_no(driver)
         for i in range(10):
             no = str(i + 1 + ad_no)
@@ -163,7 +166,12 @@ def select_back_all_re(driver):
             time.sleep(normal_delay)
             select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
             click_business = select_business.click()
+
+            normal_delay = random.normalvariate(5, 0.5)
+            time.sleep(normal_delay)
+            res_li = []
             res_li = extract_restaurant_li(driver)
+
             reviews_df = None
             reviews_df = extract_reviews_df(driver)
             count = 1
@@ -178,7 +186,6 @@ def select_back_all_re(driver):
                     count += 1
                 except:
                     pass
-            res_li = extract_restaurant_li(driver)
             reviews_df['restaurant_name'] = res_li[0]
             reviews_df['restaurant_rating'] = res_li[1]
             reviews_df['restaurant_price'] = res_li[2]
@@ -193,6 +200,8 @@ def select_back_all_re(driver):
             back_page_no = "window.history.go({})".format(str(-count))
             driver.execute_script(back_page_no)
 
+        normal_delay = random.normalvariate(2, 0.5)
+        time.sleep(normal_delay)
         next_button = driver.find_element_by_link_text("""Next""")
         next_button.click()
     return driver
