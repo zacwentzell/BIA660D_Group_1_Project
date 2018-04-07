@@ -147,64 +147,67 @@ def detect_ad_no(driver):
         ad_no = 0
     return ad_no
 
+def one_business_extract(driver):
+    res_li = []
+    res_li = extract_restaurant_li(driver)
+    reviews_df = None
+    reviews_df = extract_reviews_df(driver)
+    count = 1
+    for i in range(48):
+        try:
+            next_button = driver.find_element_by_link_text("""Next""")
+            next_button.click()
+            reviews_df_more = extract_reviews_df(driver)
+            reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index = True)
+            normal_delay = random.normalvariate(2, 0.5)
+            time.sleep(normal_delay)
+            count += 1
+        except:
+            pass
+    reviews_df['restaurant_name'] = res_li[0]
+    reviews_df['restaurant_rating'] = res_li[1]
+    reviews_df['restaurant_price'] = res_li[2]
+    reviews_df['restaurant_type'] = res_li[3]
+    file_name = str(res_li[0])+('.csv')
+    df = reviews_df
+    df.to_csv(file_name)
+    if count == 49:
+        if res_li[0] not in error_li:
+            error_li.append(res_li[0])
+            print('Pages out of range {}'.format(res_li[0]))
+    back_page_no = "window.history.go({})".format(str(-count))
+    driver.execute_script(back_page_no)
+    return driver
+
 
 def select_back_all_re(driver):
     global reviews_df, count, error_li, ad_no, res_li
 
     restaurant_xpath_li = []
     for i in range(50):
-        ad_no = None
-        ad_no = detect_ad_no(driver)
         for i in range(10):
+            ad_no = None
+            ad_no = detect_ad_no(driver)
             no = str(i + 1 + ad_no)
             re_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span/a"""
             re_xpath = re_xpath.format(no)
             restaurant_xpath_li.append(re_xpath)
 
         for i in range(len(restaurant_xpath_li)):
-            normal_delay = random.normalvariate(2, 0.5)
-            time.sleep(normal_delay)
+            res_li = None
+            reviews_df = None
             select_business = driver.find_element_by_xpath(restaurant_xpath_li[i])
             click_business = select_business.click()
 
             normal_delay = random.normalvariate(5, 0.5)
             time.sleep(normal_delay)
-            res_li = []
-            res_li = extract_restaurant_li(driver)
+            driver = one_business_extract(driver)
 
-            reviews_df = None
-            reviews_df = extract_reviews_df(driver)
-            count = 1
-            for i in range(48):
-                try:
-                    next_button = driver.find_element_by_link_text("""Next""")
-                    next_button.click()
-                    reviews_df_more = extract_reviews_df(driver)
-                    reviews_df = pd.concat([reviews_df, reviews_df_more], axis=0, names=None, ignore_index=True)
-                    normal_delay = random.normalvariate(2, 0.5)
-                    time.sleep(normal_delay)
-                    count += 1
-                except:
-                    pass
-            reviews_df['restaurant_name'] = res_li[0]
-            reviews_df['restaurant_rating'] = res_li[1]
-            reviews_df['restaurant_price'] = res_li[2]
-            reviews_df['restaurant_type'] = res_li[3]
-            file_name = str(res_li[0]) + ('.csv')
-            df = reviews_df
-            df.to_csv(file_name)
-            if count == 49:
-                if res_li[0] not in error_li:
-                    error_li.append(res_li[0])
-                    print('Pages out of range {}'.format(res_li[0]))
-            back_page_no = "window.history.go({})".format(str(-count))
-            driver.execute_script(back_page_no)
-
-        normal_delay = random.normalvariate(2, 0.5)
-        time.sleep(normal_delay)
         next_button = driver.find_element_by_link_text("""Next""")
         next_button.click()
     return driver
+
+
 
 def fix_error(error_li):
     global reviews_df, res_li
