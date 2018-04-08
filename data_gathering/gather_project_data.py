@@ -6,8 +6,8 @@ import random
 import time
 import bs4
 import pandas as pd
-import warnings
 import os
+import warnings
 warnings.filterwarnings("ignore")
 
 error_li = []
@@ -16,6 +16,7 @@ def open_website(URL='https://www.yelp.com/'):
     driver = webdriver.Chrome(executable_path='./chromedriver')
     driver.get(URL)
     return driver
+
 
 def select_location_business(driver, location_input='07030', business_type='Restaurant'):
     normal_delay = random.normalvariate(2, 0.5)
@@ -32,35 +33,19 @@ def select_location_business(driver, location_input='07030', business_type='Rest
     search_result = hit_search.click()
     return driver
 
-def extract_id_df(driver):
-    ad_no  = detect_ad_no(driver)
-    restaurant_id_xpath_li = []
-    restaurant_id_li = []
-    restaurant_name_li = []
-    for i in range(10):
-        no = str(i+1+ad_no)
-        id_xpath = """//*[@id="super-container"]/div/div[2]/div[1]/div/div[5]/ul[2]/li[{}]/div/div[1]/div[1]/div/div[2]/h3/span"""
-        id_xpath = id_xpath.format(no)
-        restaurant_id_xpath_li.append(id_xpath)
-    for i in range(len(restaurant_id_xpath_li)):
-        restaurant_id_element = driver.find_element_by_xpath(restaurant_id_xpath_li[i])
-        data_html = restaurant_id_element.get_attribute('innerHTML')
-        soup = bs4.BeautifulSoup(data_html,'html5lib')
-        restaurant_id_tag = soup.find('a').attrs
-        restaurant_id = restaurant_id_tag['data-hovercard-id']
-        restaurant_id_li.append(restaurant_id)
-
-        restaurant_name = soup.find('a').text
-        restaurant_name_li.append(restaurant_name)
-    df = pd.DataFrame(data = {'restaurant_id' : restaurant_id_li, 'restaurant_name':restaurant_name_li})
-
-    return df
 
 def extract_restaurant_li(driver):
+    global restaurant_header_element, soup
+    restaurant_header_element = None
+    try:
+        restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
+        data_html = restaurant_header_element.get_attribute('innerHTML')
+        soup = bs4.BeautifulSoup(data_html, 'html5lib')
+    except:
+        print('Error:detect header.')
+        pass
     # res_name
-    restaurant_header_element = driver.find_element_by_class_name("""biz-page-header""")
-    data_html = restaurant_header_element.get_attribute('innerHTML')
-    soup = bs4.BeautifulSoup(data_html, 'html5lib')
+
     restaurant_name_element = soup.find('h1', attrs={'class': "biz-page-title"})
     restaurant_name = restaurant_name_element.text.split()
     restaurant_name = ' '.join(restaurant_name)
@@ -98,6 +83,7 @@ def extract_restaurant_li(driver):
 
     li = [restaurant_name, restaurant_rating, restaurant_price, restaurant_tag]
     return li
+
 
 def extract_reviews_df(driver):
     name_li = []
@@ -185,7 +171,7 @@ def select_back_all_re(driver):
     global reviews_df, count, error_li, ad_no, res_li
 
     restaurant_xpath_li = []
-    for i in range(70):
+    for i in range(50):
         for i in range(10):
             ad_no = None
             ad_no = detect_ad_no(driver)
@@ -206,6 +192,7 @@ def select_back_all_re(driver):
 
         next_button = driver.find_element_by_link_text("""Next""")
         next_button.click()
+    driver.close()
     return driver
 
 
@@ -252,13 +239,22 @@ def fix_error(error_li):
         driver.close()
     return None
 
+def concat_dataset():
+    path = "/Users/mani/Desktop/Dropbox/001 - Campus courses/BIA 660 - Web Analytics/Final Project/BIA660D_Group_1_Project/data_gathering"
+    files= os.listdir(path)
+    df = pd.read_csv("Grand Vin.csv")
+    for file in files:
+        if file.endswith('csv') and file != "restaurant_id.csv" and file != "Grand Vin.csv":
+            df_new = pd.read_csv(file)
+            df = pd.concat([df, df_new], axis=0, names=None, ignore_index = True)
+    df.to_csv('Hoboken_restaurants_reviews.csv')
+
 def main():
-    global error_li
     driver = open_website('https://www.yelp.com/')
     driver = select_location_business(driver, '07030', 'Restaurant')
-    select_back_all_re(driver)
+    driver = select_back_all_re(driver)
     fix_error(error_li)
-    return None
+    concat_dataset()
 
 if __name__ == '__main__':
     main()
