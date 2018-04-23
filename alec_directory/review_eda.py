@@ -22,9 +22,11 @@ def try_convert(x, y=0):
     except: return(y)
 average_price = sum(validation['restaurant_price'].apply(lambda x: try_convert(x))) / validation['restaurant_price'].value_counts().sum()
 validation['restaurant_price'] = validation['restaurant_price'].apply(lambda x: try_convert(x, y=average_price))
-#
-from sklearn.preprocessing import
-
+# Separate Restaurant Type
+from sklearn.feature_extraction import DictVectorizer
+dv = DictVectorizer(sparse=False)
+a = validation['restaurant_type'][0]
+a
 validation.head(3)
 
 
