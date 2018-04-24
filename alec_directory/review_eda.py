@@ -1,5 +1,4 @@
 ### Review Data Exploratory Data Analysis
-
 # Navigate into the correct project directory
 import os # os.listdir()
 os.chdir('../BIA660D_Group_1_Project')
@@ -23,24 +22,102 @@ def try_convert(x, y=0):
 average_price = sum(validation['restaurant_price'].apply(lambda x: try_convert(x))) / validation['restaurant_price'].value_counts().sum()
 validation['restaurant_price'] = validation['restaurant_price'].apply(lambda x: try_convert(x, y=average_price))
 # Separate Restaurant Type
-from sklearn.feature_extraction import DictVectorizer
-dv = DictVectorizer(sparse=False)
-a = validation['restaurant_type'][0]
-a
+# from sklearn.feature_extraction import DictVectorizer
+# dv = DictVectorizer(sparse=False)
+# dv.fit_transform()
+type_list = validation['restaurant_type'].str.split(', ').str.join(' ').str.split(',')
+# type_list = validation['restaurant_type'].str.split('[,]+[ ]+')
+type_list = type_list.apply(lambda l: [w.strip() for w in l])
+# Clean specific errors in listed types
+def clean_type(types):
+    for i in range(len(types)):
+        if types[i]=='Deliswfftdfvzztzaxqcuvwesssrrqrbsuxbfedbtd':
+            types[i] = 'Delis'
+        elif types[i]=='Japanesetdassttaucfxffdddaerfstets':
+            types[i] = 'Japanese'
+        elif types[i]=='Beer Barawsuvqvreabrdbevr':
+            types[i] = 'Beer Bar'
+    return types # can't be done inplace?
+type_list = type_list.apply(lambda x: clean_type(x))
+all_types = list(set(x for l in type_list for x in l))
+# Alter original DataFrame
+validation = validation.drop(columns=['restaurant_type'])
+# type_df = pd.DataFrame(columns=all_types, index=validation.index)
+# for row in range(len(validation)):
+#     for type_index in range(len(all_types)):
+#         if all_types[type_index] in type_list[row]:
+#             type_df[all_types[type_index]][row] = 1
+#         else:
+#             type_df[all_types[type_index]][row] = 0
+dict_rows = []
+for row_index in validation.index:
+    this_row = validation.loc[row_index].to_dict()
+    for value in type_list.loc[row_index]:
+        this_row[value] = 1
+    dict_rows.append(this_row)
+validation = pd.DataFrame(dict_rows)
+validation.loc[:, all_types] = validation.loc[:, all_types].fillna(0)
+# validation.loc[:, all_types].fillna(0, inplace=True) # wasn't working
+# Now EDA, professor reccomends using SVD for the restaurant types
+
 validation.head(3)
 
 
 
-b = validation.itertuples()
-a = [x for x in b]
-a[5271:5274]
-w = a[0]
-w.__getattribute__('restaurant_price')
-# for a in validation.itertuples():
-#     # print(a)
-#     if a.__getattribute__('restaurant_price') is None:
-#     # if a['restaurant_price'].isnull():
-#         print(a)
-# validation['restaurant_price'].isnull().sum()
-# validation['restaurant_price'].apply(lambda x: x.count('$'))
+
+# dict_rows = []
+# for row_index in validation.index:
+#     this_row = validation.loc[row_index].to_dict()
+#     for value in type_list.loc[row_index]:
+#         this_row[value] = 1
+#     dict_rows.append(this_row)
+# temp = pd.DataFrame(dict_rows).fillna(0)
+# len(temp.columns) - len(validation.columns) - len(all_types) == 0 # True
+# a = temp.iloc[0]
+# a[:-len(validation.columns)].sum() # 2
+# len(type_list.iloc[0]) # 3
+# temp.head(3)
+
+# temp[['Wine Bars', 'Italian', 'Cocktail Bars']].head(3)
+#
+# for x in type_list.iloc[0]:
+#     temp
+#
+# temp.head(3)
+#
+# type_df.head(3)
+# type_list.head(3)
+# a = [x for x in validation.itertuples()]
+# b = a[0]
+#
+#
+# b = a[:3]
+# b.unique()
+# a.str.encode('base64', 'strict')
 # validation.head(3)
+#
+# from sklearn import preprocessing
+# le = preprocessing.LabelEncoder()
+# le.fit(all_types)
+#
+# from sklearn import preprocessing
+# lb = preprocessing.LabelBinarizer()
+# v = DictVectorizer(sparse=False)
+# from sklearn.preprocessing import OneHotEncoder
+# enc = OneHotEncoder()
+# enc.fit([['me', 'you'], ['you', 'i']])
+# enc = preprocessing.OneHotEncoder(n_values=[2, 3, 4])
+#
+# b = validation.itertuples()
+# a = [x for x in b]
+# a[5271:5274]
+# w = a[0]
+# w.__getattribute__('restaurant_price')
+# # for a in validation.itertuples():
+# #     # print(a)
+# #     if a.__getattribute__('restaurant_price') is None:
+# #     # if a['restaurant_price'].isnull():
+# #         print(a)
+# # validation['restaurant_price'].isnull().sum()
+# # validation['restaurant_price'].apply(lambda x: x.count('$'))
+# # validation.head(3)
