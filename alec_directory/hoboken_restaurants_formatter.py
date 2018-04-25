@@ -61,7 +61,7 @@ validation.loc[:, all_types] = validation.loc[:, all_types].fillna(0)
 # Now EDA, professor reccomends using SVD for the restaurant types
 
 validation.head(3)
-
+#test
 
 
 
