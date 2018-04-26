@@ -29,9 +29,20 @@ def get_co_occurence_result(df=None, user_idx=None, user_id = None, top_n=None):
     result_for_user = list(result_for_user.head(top_n).index.values)
     return result_for_user
 
-train_set = pd.read_csv('recommendation_dataset.csv')
-co_train_set,co_occurence_matrix = get_co_occurrence_matrices(train_set)
+def main():
+    train_set = pd.read_csv('Method_1_dataset.csv')
+    co_train_set, co_occurence_matrix = get_co_occurrence_matrices(train_set)
+    recommendation_li = []
+    for i in range(len(train_set)):
+        recommendation_for_user = get_co_occurence_result(df=co_train_set, user_id=train_set.user_id[i], top_n=3)
+        recommendation_li.append(recommendation_for_user)
 
-#test
-recommendation_for_user  = get_co_occurence_result(df = co_train_set, user_id= '--68ZwhCrUJUmCXXkMTMKw', top_n = 3)
-print(recommendation_for_user)
+    train_set = pd.DataFrame(train_set.user_id)
+    train_set['Recommendation'] = recommendation_li
+    train_set.to_csv('co_occurence_result.csv')
+    return None
+
+if __name__ == '__main__':
+    main()
+
+
