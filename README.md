@@ -24,4 +24,20 @@ provided by Yelp.
 
 Folder and File Info 
 --------------------
-**Folders** 
+
+#### *Folders*
+
+**Scraping**: Files for scraping, storing, and cleaning the Hoboken review data 
+(validation dataset) off of the web. 
+
+**EDA**: Files for preprocessing data and transforming 
+
+#### *Files*
+
+**README.md**: This file! Information related to the project and the repository. 
+
+**.gitignore**: A plain text list of files to ignore and not upload to the Github
+repository. Important since some of the files we're dealing with contain many 
+millions of entries and as a result may be multiple GB in size. The remote Github 
+repository can't handle files of this size, so they must be stored on each group 
+member's local repository. 
