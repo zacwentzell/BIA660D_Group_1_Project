@@ -25,14 +25,14 @@ provided by Yelp.
 Folder and File Info 
 --------------------
 
-#### *Folders*
+### *Folders*
 
 **Scraping**: Files for scraping, storing, and cleaning the Hoboken review data 
 (validation dataset) off of the web. 
 
 **EDA**: Files for preprocessing data and transforming 
 
-#### *Files*
+### *Files*
 
 **README.md**: This file! Information related to the project and the repository. 
 
