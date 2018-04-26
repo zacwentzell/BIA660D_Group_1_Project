@@ -4,6 +4,7 @@ import urllib3
 import time
 import random
 from string import digits
+import pandas as pd
 url_base='https://www.yelp.com/search?find_desc=Restaurants&find_loc=Hoboken%2C+NJ&start='
 remove_digits=str.maketrans('','',digits)
 res_name_list=[]
@@ -18,6 +19,4 @@ while res_number <= 680:
         res_name_list.append(res_name[x].text.replace('.','').translate (remove_digits).strip())
     time.sleep(random.randint(2,4))
     res_number+=10
-    import pandas as pd
-
     name_df = pd.DataFrame(res_name_list)
