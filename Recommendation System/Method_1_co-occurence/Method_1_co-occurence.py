@@ -58,7 +58,7 @@ def store_result(co_occurence_dataset, co_occurence_matrix):
         print(i)
     print('Done!')
     # create export dataset
-    df = pd.read_csv('recommendation_dataset.csv')
+    df = pd.read_csv('method_1_dataset.csv')
     # first column
     df = pd.DataFrame(df.user_id)
     # second column
@@ -68,7 +68,7 @@ def store_result(co_occurence_dataset, co_occurence_matrix):
     return None
 
 def main():
-    df = pd.read_csv('recommendation_dataset.csv')
+    df = pd.read_csv('method_1_dataset.csv')
     co_occurence_dataset = get_dataset_co_occurence(df)
     co_occurence_matrix = get_co_occurrence_matrices(co_occurence_dataset)
     store_result(co_occurence_dataset, co_occurence_matrix)
