@@ -27,13 +27,13 @@ Folder and File Info
 
 ### Folders
 
-**Scraping**: Files for scraping, storing, and cleaning the Hoboken review data 
+**scraping**: Files for scraping, storing, and cleaning the Hoboken review data 
 (validation dataset) off of the web. 
 
-**Yelp_Dataset**: Files for formatting and storing the data provided in the Yelp
+**yelp_dataset**: Files for formatting and storing the data provided in the Yelp
 Open Dataset. Subfolders here are included in .gitignore. 
 
-**EDA**: Files for preprocessing data and transforming 
+**eda**: Files for preprocessing data and transforming 
 
 ### Files
 
