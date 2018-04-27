@@ -1,4 +1,7 @@
-### Review Data Exploratory Data Analysis
+"""
+Convert the scraped data from Hoboken into the same format as the Yelp Open Dataset data
+BIA660D - Group 1: Alec Kulakowski
+"""
 # Navigate into the correct project directory
 import os # os.listdir()
 os.chdir('../BIA660D_Group_1_Project')

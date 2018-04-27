@@ -22,4 +22,5 @@ and files from the Yelp Open Dataset.
 
 **README.md**: This file! Information related to the folder and its files. 
 
-**scraping.csv**: 
+**convert_dataset.py** (in progress): Run this file to convert the Yelp 
+Dataset files from JSON to CSV and store them in the same folder. 
