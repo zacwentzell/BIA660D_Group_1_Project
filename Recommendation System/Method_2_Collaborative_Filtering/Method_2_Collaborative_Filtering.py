@@ -3,24 +3,44 @@ import graphlab
 from sklearn.model_selection import train_test_split
 
 
-df = pd.read_csv('Method_2_dataset.csv')
-train_data, test_data = train_test_split(df, test_size=0.25)
-train_data_gl = graphlab.SFrame(train_data)
-test_data_gl = graphlab.SFrame(test_data)
 
+def get_train_test(file_name):
+    df = pd.read_csv(file_name)
+    train_data, test_data = train_test_split(df, test_size=0.25)
+    train_data_gl = graphlab.SFrame(train_data)
+    test_data_gl = graphlab.SFrame(test_data)
+    return train_data_gl, test_data_gl
 
-Cosine_model = graphlab.item_similarity_recommender.create(train_data_gl, user_id='user_id',
-                                                             item_id='restaurant_name',
-                                                             target='user_rating',
-                                                             similarity_type='cosine')
+def get_similarity_model(train, solver):
+    if solver == 'cosine':
+        Cosine_model = graphlab.item_similarity_recommender.create(train, user_id='user_id',
+                                                                     item_id='restaurant_name',
+                                                                     target='user_rating',
+                                                                     similarity_type='cosine')
+        model = Cosine_model
+    elif solver == 'jaccard':
+        Jaccard_model = graphlab.item_similarity_recommender.create(train, user_id='user_id',
+                                                                     item_id='restaurant_name',
+                                                                     target='user_rating',
+                                                                    similarity_type='jaccard')
+        model = Jaccard_model
+    else:
+        print('Unknown Error!')
+    return model
 
-Jaccard_model = graphlab.item_similarity_recommender.create(train_data_gl, user_id='user_id',
-                                                             item_id='restaurant_name',
-                                                             target='user_rating',
-                                                             similarity_type='jaccard')
+def get_result(export_name, model, top_n=3):
+    recommendation = model.recommend(k=top_n,verbose=False)
+    recommendation.save(export_name)
+    return None
 
-Cosine_recommendation = Cosine_model.recommend(k=3,verbose=False)
-Cosine_recommendation.save('Cosine_recommendation_result.csv')
+def main():
+    train, test = get_train_test('Method_2_dataset.csv')
+    model = get_similarity_model(train, 'cosine')
+    #model = get_similarity_model(train, 'jaccard')
 
-Jaccard_recommendation = Jaccard_model.recommend(k=3,verbose=False)
-Cosine_recommendation.save('Jaccard_recommendation_result.csv')
+    get_result('Cosine_recommendation_result.csv', model, 3)
+    #get_result('Jaccard_recommendation_result.csv', model, 3)
+    return None
+
+if __name__ == '__main__':
+    main()
