@@ -7,8 +7,10 @@ For more information on the Yelp Dataset Challenge please visit http://yelp.com/
 import argparse
 import collections
 import csv
-import simplejson as json
-
+try:
+    import simplejson as json
+except:
+    import json
 
 def read_and_write_file(json_file_path, csv_file_path, column_names):
     """Read in the json dataset file and write it out to a csv file, given the column names."""
@@ -49,7 +51,8 @@ def get_column_names(line_contents, parent_key=''):
 
     """
     column_names = []
-    for k, v in line_contents.iteritems():
+    # for k, v in line_contents.iteritems(): # doesn't work in Python 3
+    for k, v in line_contents.items():
         column_name = "{0}.{1}".format(parent_key, k) if parent_key else k
         if isinstance(v, collections.MutableMapping):
             column_names.extend(
