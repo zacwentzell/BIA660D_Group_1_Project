@@ -6,10 +6,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import RegexpTokenizer
 
-df = pd.read_csv('Hoboken_restaurants_reviews_cleaned.csv')
-nn_df = df[['user_id','restaurant_name','user_rating','restaurant_rating','restaurant_price','restaurant_type']]
-nn_df = nn_df.dropna()
-
 def normalize_variable(nn_df,variable_names):
     variables_li = []
     for variable in variable_names:
@@ -58,24 +54,43 @@ def get_output(top_n, y_test,recommendation_df):
     output = output.replace(']','')
     return output
 
-variable_names = ['user_rating', 'restaurant_rating', 'restaurant_price']
+def store_the_recommendation(X_train, y_train,nn_df, top_n, nn):
+    export_df = pd.DataFrame(nn_df.user_id)
+    recommendation_li = []
+    for i in range(len(X_train)):
+        X_test = np.asarray(X_train.iloc[i, :])
+        X_test = X_test.reshape(-1, 1).T
+        y_test = y_train.iloc[i]
+        recommendation_df = get_recommendation_df(nn, X_test)
+        output = get_output(top_n, y_test, recommendation_df)
+        recommendation_li.append(output)
+    export_df['Recommendation'] = recommendation_li
+    export_df.to_csv('Neural_Network_result.csv', index=False)
+    return None
 
-norm_result = normalize_variable(nn_df,variable_names)
+def main():
+    df = pd.read_csv('Hoboken_restaurants_reviews_cleaned.csv')
+    nn_df = df[['user_id','restaurant_name','user_rating','restaurant_rating','restaurant_price','restaurant_type']]
+    nn_df = nn_df.dropna()
 
-tfidf_m, tfidf_d = get_tf(nn_df['restaurant_type'], idf=True, max_df=0.5, min_df=10)
+    variable_names = ['user_rating', 'restaurant_rating', 'restaurant_price']
 
-df = get_nn_df(nn_df, norm_result, tfidf_d, variable_names)
+    norm_result = normalize_variable(nn_df,variable_names)
 
-X_train = df.iloc[:,:-1]
-y_train = df.output
+    tfidf_m, tfidf_d = get_tf(nn_df['restaurant_type'], idf=True, max_df=0.5, min_df=10)
 
-nn= MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(16, 3), random_state=1)
-nn = nn.fit(X_train, y_train)
+    df = get_nn_df(nn_df, norm_result, tfidf_d, variable_names)
 
-top_n = 3
-X_test = np.asarray(X_train.iloc[2150,:])
-X_test = X_test.reshape(-1,1).T
-y_test = y_train.iloc[2150]
-recommendation_df = get_recommendation_df(nn, X_test)
+    X_train = df.iloc[:,:-1]
+    y_train = df.output
 
-output = get_output(top_n,y_test,recommendation_df)
+    nn= MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(16, 3), random_state=1)
+    nn = nn.fit(X_train, y_train)
+
+    top_n = 3
+    store_the_recommendation(X_train, y_train ,nn_df, top_n, nn)
+
+if __name__ == '__main__':
+    main()
+
+
