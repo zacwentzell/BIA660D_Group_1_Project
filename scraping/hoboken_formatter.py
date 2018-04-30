@@ -5,6 +5,10 @@ BIA660D - Group 1: Alec Kulakowski
 # Navigate into the correct project directory
 import os # os.listdir()
 os.chdir('../BIA660D_Group_1_Project')
+
+temp = pd.read_csv('yelp_dataset/dataset/review.csv')
+
+temp = pd.DataFrame.from_csv('yelp_dataset/dataset/review.csv')
 # Extract the review data from its .zip form
 from zipfile import ZipFile
 import pandas as pd

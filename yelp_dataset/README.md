@@ -1,5 +1,7 @@
 # Yelp Open Dataset Folder 
 
+**Contributers**: Alec Kulakowski,
+
 **Instructions**: Follow the steps on the 
 [Yelp Open Dataset](https://www.yelp.com/dataset) website to download the 
 dataset in JSON format. Once downloaded, you will have *yelp_dataset.tar*. 

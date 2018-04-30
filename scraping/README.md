@@ -1,5 +1,7 @@
 # Scraping Folder 
 
+**Contributers**: Alec Kulakowski, Mani 
+
 Folder and File Info 
 --------------------
 
