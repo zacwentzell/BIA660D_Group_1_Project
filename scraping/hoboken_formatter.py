@@ -44,6 +44,10 @@ def clean_type(types):
     return types # can't be done inplace?
 type_list = type_list.apply(lambda x: clean_type(x))
 all_types = list(set(x for l in type_list for x in l))
+# Now it's clean, lets pause to save
+# validation['restaurant_type'] = type_list
+# validation.to_csv('scraping/hoboken_cleaned.csv')
+
 # Alter original DataFrame
 validation = validation.drop(columns=['restaurant_type'])
 # type_df = pd.DataFrame(columns=all_types, index=validation.index)
