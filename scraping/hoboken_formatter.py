@@ -5,15 +5,12 @@ BIA660D - Group 1: Alec Kulakowski
 # Navigate into the correct project directory
 import os # os.listdir()
 os.chdir('../BIA660D_Group_1_Project')
-
-temp = pd.read_csv('yelp_dataset/dataset/review.csv')
-
-temp = pd.DataFrame.from_csv('yelp_dataset/dataset/review.csv')
 # Extract the review data from its .zip form
 from zipfile import ZipFile
 import pandas as pd
 zf = ZipFile("Hoboken_restaurants_reviews.csv.zip")
-validation = pd.read_csv(zf.open('Hoboken_restaurants_reviews.csv'))
+raw = pd.read_csv(zf.open('Hoboken_restaurants_reviews.csv'))
+validation = raw.copy()
 validation = validation.drop(columns=validation.columns.values[0:2]) # Drop index columns
 # Convert user_ratings from string to integer and restaurant ratings from string to float
 validation['user_rating'] = validation['user_rating'].apply(lambda x: int(x[0]))
@@ -67,10 +64,14 @@ validation.loc[:, all_types] = validation.loc[:, all_types].fillna(0)
 # validation.loc[:, all_types].fillna(0, inplace=True) # wasn't working
 # Now EDA, professor reccomends using SVD for the restaurant types
 
-validation.head(3)
+validation.head(2)
+raw.head(2)
 #test
 
-
+#is this really clean?
+clean = pd.read_csv('Recommendation System/Hoboken_restaurants_reviews_cleaned.csv')
+clean.head(2)
+type(clean.loc[0]['restaurant_type']) #is str, should be list w/3  items
 
 # dict_rows = []
 # for row_index in validation.index:

@@ -44,3 +44,9 @@ repository. Important since some of the files we're dealing with contain many
 millions of entries and as a result may be multiple GB in size. The remote Github 
 repository can't handle files of this size, so they must be stored on each group 
 member's local repository. 
+
+Notes 
+-----
+**RE: *Recommendation System/Hoboken_restaurants_reviews_cleaned.csv***: Does not
+vectorize or even properly clean the 'Restaurant Type' data, does not deal with 
+missing values for restaurant price. 
