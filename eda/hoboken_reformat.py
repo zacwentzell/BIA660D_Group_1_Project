@@ -14,7 +14,7 @@ hoboken_raw.head(2)
 #bias, we'd need to know the mean review for the restaurant at the time of each review, which could be done manually
 #post scraping if scraping had included review date or order.
 restaurant_list = hoboken_raw['restaurant_name'].unique()
-for restaurant in restaurant_list:
+for restaurant in restaurant_list: # warning: Takes a LONG time
     review_indexes = hoboken_raw.loc[hoboken_raw['restaurant_name'] == restaurant].index
     review_count = len(review_indexes)
     superscore = review_count * hoboken_raw.iloc[review_indexes[0]]['restaurant_rating']

@@ -22,17 +22,20 @@ data['restaurant_type'] = data['restaurant_type'].map(clean_types)
 data.head(2)
 all_types = set()
 x = data['restaurant_type'].apply(all_types.update)
-type_data = pd.Series(index=list(all_types))
-for type in list(all_types):
-    cumsum = 0
-    count = 0
-    for row_n in range(len(data)):
-        row = data.iloc[row_n]
-        if type in row['restaurant_type']:
-            cumsum = cumsum + row['user_rating']
-            count = count + 1
-    type_data[type] = cumsum/count
-type_data.head()
+# type_data = pd.Series(index=list(all_types))
+# for type in list(all_types): # warning: Takes a LONG time
+#     cumsum = 0
+#     count = 0
+#     for row_n in range(len(data)):
+#         row = data.iloc[row_n]
+#         if type in row['restaurant_type']:
+#             cumsum = cumsum + row['user_rating']
+#             count = count + 1
+#     type_data[type] = cumsum/count
+# type_data.head()
+# type_data.to_csv('../BIA660D_Group_1_Project/eda/type_data.csv', index=True)
+type_data = pd.DataFrame.from_csv('../BIA660D_Group_1_Project/eda/type_data.csv')
+list(type_data.index.values)
 #TODO: remove
-data['restaurant_type'][300]
-all_types.update(data['restaurant_type'][300])
+# data['restaurant_type'][300]
+# all_types.update(data['restaurant_type'][300])
