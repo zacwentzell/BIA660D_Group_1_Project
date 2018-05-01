@@ -30,10 +30,20 @@ test_bigram = bigram_vectorizer.transform(test_reviews)
 # Now to fit models
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 def per(x): return(str(round(100*x,2))+'%')
-mlp = MLPClassifier(tol=0.0002, random_state=1)
+mlp = MLPClassifier(tol=0.0005, random_state=1)
 mlp.fit(train_bow, train_ratings)
-print(per(mlp.score(train_bow, train_ratings))+' training accuracy, '+per(mlp.score(test_bow, test_ratings))+' testing accuracy')
 # Try with regressor
-regressor = MLPRegressor(tol=0.0002, random_state=1)
+regressor = MLPRegressor(tol=0.0005, random_state=1)
 regressor.fit(train_bow, train_ratings)
-print(per(regressor.score(train_bow, train_ratings))+' training accuracy, '+per(regressor.score(test_bow, test_ratings))+' testing accuracy')
+print('Bag-of-Words:')
+print('Classifier Results: '+per(mlp.score(train_bow, train_ratings))+' training accuracy, '+per(mlp.score(test_bow, test_ratings))+' testing accuracy')
+print('Regressor Results: '+per(regressor.score(train_bow, train_ratings))+' training accuracy, '+per(regressor.score(test_bow, test_ratings))+' testing accuracy')
+# Oh, those results are sad, let's do it with bag-of-bigrams
+mlp = MLPClassifier(tol=0.0005, random_state=1)
+regressor = MLPRegressor(tol=0.0005, random_state=1)
+mlp.fit(train_bigram, train_ratings)
+regressor.fit(train_bigram, train_ratings)
+print('Bag-of-Bigrams:')
+print('Classifier Results: '+per(mlp.score(train_bigram, train_ratings))+' training accuracy, '+per(mlp.score(test_bigram, test_ratings))+' testing accuracy')
+print('Regressor Results: '+per(regressor.score(train_bigram, train_ratings))+' training accuracy, '+per(regressor.score(test_bigram, test_ratings))+' testing accuracy')
+
