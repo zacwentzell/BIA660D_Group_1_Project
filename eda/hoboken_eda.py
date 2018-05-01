@@ -34,8 +34,7 @@ x = data['restaurant_type'].apply(all_types.update)
 #     type_data[type] = cumsum/count
 # type_data.head()
 # type_data.to_csv('../BIA660D_Group_1_Project/eda/type_data.csv', index=True)
+# type_data.to_csv('../BIA660D_Group_1_Project/eda/type_data.csv', index=True, header=['Average_Score'])
 type_data = pd.DataFrame.from_csv('../BIA660D_Group_1_Project/eda/type_data.csv')
-list(type_data.index.values)
-#TODO: remove
-# data['restaurant_type'][300]
-# all_types.update(data['restaurant_type'][300])
+type_data.head(3)
+type_data.sort_values(by='Average_Score')
