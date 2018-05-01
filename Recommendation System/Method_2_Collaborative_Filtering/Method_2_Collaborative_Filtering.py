@@ -22,6 +22,12 @@ def get_similarity_model(train, solver):
                                                                      target='user_rating',
                                                                     similarity_type='jaccard')
         model = Jaccard_model
+    elif solver == 'pearson':
+        Pearson_model = graphlab.item_similarity_recommender.create(train_data_gl, user_id='user_id',
+                                                                    item_id='restaurant_name',
+                                                                    target='user_rating',
+                                                                    similarity_type='pearson')
+        model = Pearson_model
     else:
         print('Unknown Error!')
     return model
@@ -35,9 +41,12 @@ def main():
     train, test = get_train_test('method_2_dataset.csv')
     #model = get_similarity_model(train, 'cosine')
     model = get_similarity_model(train, 'jaccard')
+    #model = get_similarity_model(train, 'pearson')
+
 
     #get_result('Cosine_recommendation_result.csv', model, 3)
     get_result('Jaccard_recommendation_result.csv', model, 3)
+    #get_result('Pearson_recommendation_result.csv', model, 3)
     return None
 
 if __name__ == '__main__':
