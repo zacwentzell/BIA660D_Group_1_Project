@@ -13,7 +13,26 @@ data.head(2)
 # Explore distribution of
 # data['restaurant_rating'].plot(type='')
 rating_distribution = data['user_rating'].value_counts().loc[list(range(1,6))]
-data['restaurant_type'] = data['restaurant_type'].map(lambda x: x.replace("'",'').replace('[','').replace(']','').split(','))
+def clean_types(x):
+    x = x.replace("'", "")
+    x = x.replace("[", "").replace("]", "")
+    x = x.split(', ')
+    return(x)
+data['restaurant_type'] = data['restaurant_type'].map(clean_types)
+data.head(2)
 all_types = set()
-for types in data['restaurant_type']:
-
+x = data['restaurant_type'].apply(all_types.update)
+type_data = pd.Series(index=list(all_types))
+for type in list(all_types):
+    cumsum = 0
+    count = 0
+    for row_n in range(len(data)):
+        row = data.iloc[row_n]
+        if type in row['restaurant_type']:
+            cumsum = cumsum + row['user_rating']
+            count = count + 1
+    type_data[type] = cumsum/count
+type_data.head()
+#TODO: remove
+data['restaurant_type'][300]
+all_types.update(data['restaurant_type'][300])
