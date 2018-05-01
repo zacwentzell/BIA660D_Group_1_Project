@@ -53,3 +53,5 @@ missing values for restaurant price.
 
 **Known Issues**: Scraped review data has no evaluations of 'Useful', 'Funny', 
 or 'Cool'.
+
+Just let you guys know Recommendation System/Hoboken_restaurants_reviews_cleaned.csv only works for recommendation system part(done two weeks ago). If you really need the vectorized data, there is a normalized one for Neural Network algorithms, which is on path - Recommendation System/Method_4_Deep_Learning(done last week). But I still think all of us should do data preprocessing for different objectives. There is not a perfect dataset for different tasks. - Mani
