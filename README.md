@@ -51,4 +51,5 @@ Notes
 vectorize or even properly clean the 'Restaurant Type' data, does not deal with 
 missing values for restaurant price. 
 
-**Known Issues**: Scraped review data has no evaluations of 'Useful', 'Funny', or 
+**Known Issues**: Scraped review data has no evaluations of 'Useful', 'Funny', 
+or 'Cool'.
