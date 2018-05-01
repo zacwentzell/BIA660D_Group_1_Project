@@ -3,7 +3,7 @@ Clean and EDA the Hoboken review data
 BIA660D - Group 1: Alec Kulakowski
 """
 import pandas as pd
-hoboken_raw = pd.read_csv('../BIA660D_Group_1_Project/scraping/hoboken_cleaned.csv') # TODO: Remove
+hoboken_raw = pd.read_csv('../BIA660D_Group_1_Project/scraping/hoboken_cleaned.csv')
 hoboken_raw.head(2)
 # Lets first move all user data, since this isn't the reccomendation system and user data would just help
 # overfit the model.
@@ -23,7 +23,10 @@ for restaurant in restaurant_list:
         review.loc['restaurant_rating'] = (superscore - review['user_rating']) / (review_count - 1)
         hoboken_raw.iloc[i] = review
         print("Review #"+str(i)+" done.")
-hoboken_new = hoboken_raw.copy()
+# hoboken_new = hoboken_raw.copy()
+hoboken_raw.to_csv('../BIA660D_Group_1_Project/eda/hoboken_step1.csv')
+#########################
+
 hoboken_raw.head()
 # TODO: Remove
 restaurant = restaurant_list[3]
