@@ -35,6 +35,9 @@ Open Dataset. Subfolders here are included in .gitignore.
 
 **eda**: Files for preprocessing data and transforming 
 
+**prediction**: Files for predicting Yelp star ratings based on review text and 
+metadata. 
+
 ### Files
 
 **README.md**: This file! Information related to the project and the repository. 
