@@ -102,8 +102,8 @@ print('BOW Results: '+per(par_bow_train)+' training accuracy, '+per(par_bow_test
 print('Bigram Results: '+per(par_bigram_test)+' training accuracy, '+per(par_bigram_test)+' testing accuracy')
 # Lets try linear
 from sklearn.linear_model import LogisticRegression
-logistic = LogisticRegression(solver='sag', random_state=1, max_iter=500)
-logistic2 = LogisticRegression(solver='sag', random_state=1, max_iter=500)
+logistic = LogisticRegression(solver='sag2', random_state=1, max_iter=200)
+logistic2 = LogisticRegression(solver='sag', random_state=1, max_iter=200)
 logistic.fit(train_bow, train_ratings)
 logistic2.fit(train_bigram, train_ratings)
 log_bow_train = logistic.score(train_bow, train_ratings)
@@ -112,15 +112,98 @@ log_bigram_train = logistic2.score(train_bigram, train_ratings)
 log_bigram_test = logistic2.score(test_bigram, test_ratings)
 print('BOW: train:'+per(log_bow_train)+', test:'+per(log_bow_test))
 print('Bigram: train:'+per(log_bigram_train)+', test:'+per(log_bigram_test))
-
+#Random Forest
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+rfc = RandomForestClassifier(random_state=1, n_estimators = 30) #n_estimators=10
+rfc2 = RandomForestClassifier(random_state=1, n_estimators = 30) #n_estimators=10
+rfc.fit(train_bow, train_ratings)
+rfc2.fit(train_bigram, train_ratings)
+rfc_bow_train = rfc.score(train_bow, train_ratings)
+rfc_bow_test = rfc.score(test_bow, test_ratings)
+rfc_bigram_train = rfc2.score(train_bigram, train_ratings)
+rfc_bigram_test = rfc2.score(test_bigram, test_ratings)
+print('Random Forest Classifier:')
+print('BOW: train:'+per(rfc_bow_train)+', test:'+per(rfc_bow_test))
+print('Bigram: train:'+per(rfc_bigram_train)+', test:'+per(rfc_bigram_test))
+#Regressor
+rfr = RandomForestRegressor(random_state=1, n_estimators=30)
+rfr2 = RandomForestRegressor(random_state=1, n_estimators=30)
+rfr.fit(train_bow, train_ratings)
+rfr2.fit(train_bigram, train_ratings)
+rfr_bow_train = rfr.score(train_bow, train_ratings)
+rfr_bow_test = rfr.score(test_bow, test_ratings)
+rfr_bigram_train = rfr2.score(train_bigram, train_ratings)
+rfr_bigram_test = rfr2.score(test_bigram, test_ratings)
+print('Random Forest Regressor:')
+print('BOW: train:'+per(rfr_bow_train)+', test:'+per(rfr_bow_test))
+print('Bigram: train:'+per(rfr_bigram_train)+', test:'+per(rfr_bigram_test))
+## KNN ###
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+knc = KNeighborsClassifier()
+knc2 = KNeighborsClassifier()
+knc.fit(train_bow, train_ratings)
+knc2.fit(train_bigram, train_ratings)
+knc_bow_train = knc.score(train_bow, train_ratings)
+knc_bow_test = knc.score(test_bow, test_ratings)
+knc_bigram_train = knc2.score(train_bigram, train_ratings)
+knc_bigram_test = knc2.score(test_bigram, test_ratings)
+print('KNN Classifier:')
+print('BOW: train:'+per(knc_bow_train)+', test:'+per(knc_bow_test))
+print('Bigram: train:'+per(knc_bigram_train)+', test:'+per(knc_bigram_test))
+#regressor
+knr = KNeighborsRegressor()
+knr2 = KNeighborsRegressor()
+knr.fit(train_bow, train_ratings)
+knr2.fit(train_bigram, train_ratings)
+knr_bow_train = knr.score(train_bow, train_ratings)
+knr_bow_test = knr.score(test_bow, test_ratings)
+knr_bigram_train = knr2.score(train_bigram, train_ratings)
+knr_bigram_test = knr2.score(test_bigram, test_ratings)
+print('KNN Regressor:')
+print('BOW: train:'+per(knr_bow_train)+', test:'+per(knr_bow_test))
+print('Bigram: train:'+per(knr_bigram_train)+', test:'+per(knr_bigram_test))
+### Decision Tree
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+dtc = DecisionTreeClassifier()
+dtc2 = DecisionTreeClassifier()
+dtc.fit(train_bow, train_ratings)
+dtc2.fit(train_bigram, train_ratings)
+dtc_bow_train = dtc.score(train_bow, train_ratings)
+dtc_bow_test = dtc.score(test_bow, test_ratings)
+dtc_bigram_train = dtc2.score(train_bigram, train_ratings)
+dtc_bigram_test = dtc2.score(test_bigram, test_ratings)
+print('Decision Tree Classifier:')
+print('BOW: train:'+per(dtc_bow_train)+', test:'+per(dtc_bow_test))
+print('Bigram: train:'+per(dtc_bigram_train)+', test:'+per(dtc_bigram_test))
+# Regressor
+dtr = DecisionTreeRegressor()
+dtr2 = DecisionTreeRegressor()
+dtr.fit(train_bow, train_ratings)
+dtr2.fit(train_bigram, train_ratings)
+dtr_bow_train = dtr.score(train_bow, train_ratings)
+dtr_bow_test = dtr.score(test_bow, test_ratings)
+dtr_bigram_train = dtr2.score(train_bigram, train_ratings)
+dtr_bigram_test = dtr2.score(test_bigram, test_ratings)
+print('Decision Tree Regressor:')
+print('BOW: train:'+per(dtr_bow_train)+', test:'+per(dtr_bow_test))
+print('Bigram: train:'+per(dtr_bigram_train)+', test:'+per(dtr_bigram_test))
 # now for results table
-models = ['NN_Classifier', 'NN_Regressor', 'SVM', 'PA_Classifier', 'PA_Regressor']
+models = ['NN_Classifier', 'NN_Regressor', 'SVM', 'PA_Classifier', 'PA_Regressor', 'Logistic',\
+          'RF_Classifier', 'RF_Regressor', 'KNN_Classifier', 'KNN_Regressor', 'DT_Classifier', 'DT_Regressor']
 results = [['Bag-of-Words Training', 'Bag-of-Words Test', 'Bag-of-Bigrams Training', 'Bag-of-Bigrams Test'],
            [nn_classifier_bow_train, nn_classifier_bow_test, nn_classifier_bigram_train, nn_classifier_bigram_test],
            [nn_regressor_bow_train, nn_regressor_bow_test, nn_regressor_bigram_train, nn_regressor_bigram_test],
            [svm_bow_train, svm_bow_test, svm_bigram_train, svm_bigram_test],
            [pac_bow_train, pac_bow_test, pac_bigram_train, pac_bigram_test],
-           [par_bow_train, par_bow_test, par_bigram_train, par_bigram_test]]
+           [par_bow_train, par_bow_test, par_bigram_train, par_bigram_test],
+           [log_bow_train, log_bow_test, log_bigram_train, log_bigram_test],
+           [rfc_bow_train, rfc_bow_test, rfc_bigram_train, rfc_bigram_test],
+           [rfr_bow_train, rfr_bow_test, rfr_bigram_train, rfr_bigram_test],
+           [knc_bow_train, knc_bow_test, knc_bigram_train, knc_bigram_test],
+           [knr_bow_train, knr_bow_test, knr_bigram_train, knr_bigram_test],
+           [dtc_bow_train, dtc_bow_test, dtc_bigram_train, dtc_bigram_test],
+           [dtr_bow_train, dtr_bow_test, dtr_bigram_train, dtr_bigram_test]]
 result_df = pd.DataFrame(results[1:], columns = results[0], index = models)
+result_df.to_csv('../BIA660D_Group_1_Project/eda/bow_preliminary.csv')
 result_df
-# Best results in training from:
+# Best results in training from:data = pd.read_csv('../BIA660D_Group_1_Project/eda/hoboken_step1.csv')
