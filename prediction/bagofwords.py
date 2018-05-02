@@ -26,7 +26,7 @@ test_bow = vectorizer.transform(test_reviews)
 # Now with bag-of-bigrams #ngram_range=(1,2) # changed to (2)
 bigram_vectorizer = CountVectorizer(strip_accents='ascii', stop_words='english', binary=True, max_df=0.9, max_features=1000, ngram_range=(1,2))
 bigram_vectorizer.fit(train_reviews)
-len(bigram_vectorizer.vocabulary_)
+# len(bigram_vectorizer.vocabulary_)
 train_bigram = bigram_vectorizer.transform(train_reviews)
 test_bigram = bigram_vectorizer.transform(test_reviews)
 del vectorizer, bigram_vectorizer
@@ -150,12 +150,10 @@ rfr_bow_train = rfr.score(train_bow, train_ratings)
 rfr_bow_test = rfr.score(test_bow, test_ratings)
 rfr_bigram_train = rfr2.score(train_bigram, train_ratings)
 rfr_bigram_test = rfr2.score(test_bigram, test_ratings)
-rfr = rfr2 = 1
 print('Random Forest Regressor:')
 print('BOW: train:'+per(rfr_bow_train)+', test:'+per(rfr_bow_test))
 print('Bigram: train:'+per(rfr_bigram_train)+', test:'+per(rfr_bigram_test))
-# rfr = rfr2 = None
-del rfr, rfr2
+del rfr, rfr2 # rfr = rfr2 = None
 #
 import gc
 gc.collect()
