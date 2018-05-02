@@ -102,7 +102,7 @@ print('BOW Results: '+per(par_bow_train)+' training accuracy, '+per(par_bow_test
 print('Bigram Results: '+per(par_bigram_test)+' training accuracy, '+per(par_bigram_test)+' testing accuracy')
 # Lets try linear
 from sklearn.linear_model import LogisticRegression
-logistic = LogisticRegression(solver='sag2', random_state=1, max_iter=200)
+logistic = LogisticRegression(solver='sag', random_state=1, max_iter=200)
 logistic2 = LogisticRegression(solver='sag', random_state=1, max_iter=200)
 logistic.fit(train_bow, train_ratings)
 logistic2.fit(train_bigram, train_ratings)
@@ -110,6 +110,7 @@ log_bow_train = logistic.score(train_bow, train_ratings)
 log_bow_test = logistic.score(test_bow, test_ratings)
 log_bigram_train = logistic2.score(train_bigram, train_ratings)
 log_bigram_test = logistic2.score(test_bigram, test_ratings)
+print('Logistic Regression:')
 print('BOW: train:'+per(log_bow_train)+', test:'+per(log_bow_test))
 print('Bigram: train:'+per(log_bigram_train)+', test:'+per(log_bigram_test))
 #Random Forest
@@ -204,6 +205,39 @@ results = [['Bag-of-Words Training', 'Bag-of-Words Test', 'Bag-of-Bigrams Traini
            [dtc_bow_train, dtc_bow_test, dtc_bigram_train, dtc_bigram_test],
            [dtr_bow_train, dtr_bow_test, dtr_bigram_train, dtr_bigram_test]]
 result_df = pd.DataFrame(results[1:], columns = results[0], index = models)
-result_df.to_csv('../BIA660D_Group_1_Project/eda/bow_preliminary.csv')
+result_df.to_csv('../BIA660D_Group_1_Project/prediction/bagofwords.csv')
+# result_df = pd.DataFrame.from_csv('../BIA660D_Group_1_Project/prediction/bagofwords.csv')
 result_df
-# Best results in training from:data = pd.read_csv('../BIA660D_Group_1_Project/eda/hoboken_step1.csv')
+"""
+Notes:
+
+The SVM in question has a linear Kernal, and is based on 
+http://www.developintelligence.com/blog/2017/03/predicting-yelp-star-ratings-review-text-python/
+
+Classifier's have an advantage in terms of accuracy because the output is restricted to one of the valid options 
+(int 1,2,3,4,5) regressors can be any number, it can result in numbers way outside the possible range of valid 
+outcomes and it can also result in numbers within the range but not exactly equal to any valid number (like floats
+between 1 and 2). Classifier accuracy can be judged based on whether or not they got the right value, with no partial
+credit assigned for getting values close to it. Since it must be one out of 5 possible options, there's a chance of 
+getting it right or getting an above average accuracy even with a weak predictor model. For the regressors, accuracy
+is judged by R^2 which even allows for a negative accuracy (as happened with the Passive Aggressive regressor). 
+we can't avoid this or alter the 'score' metric easily as sklearn does not allow alternate error metrics or scores
+including Adjusted R^2 or MSE or something similar. A weak predicting regressor would likely have a very low chance 
+of getting anywhere near the correct value without being part of some gradient boosting system. Therefore, even though
+the classifiers outperformed the regressors accross-the-board in terms of score, if we take into account the scores and
+the a priori notion that regressors allow for the linearity of features and the relation between ratings, then we should
+accept a slightly lower score from a regressor as being comparable to a slightly higher score from a classifier on the 
+same data. A notable comment to be made regarding the use of regressors is that the distance between the output labels
+matters. On Yelp rating data in particular, it would make the implicit assumption that the difference between a 1-star
+rating and a 2-star rating is the same as the difference between a 4-star and a 5-star rating and half the difference
+between a 2-star and 4-star rating and so on. This is not necessarily the case as Yelp never claims that it is a 
+perfectly linear scale and Yelp users do not use it as such. 
+
+More information on this subject can be gleaned from examilning the distribution of Yelp review ratings and restauarant
+ratings in our other EDA files, the ratings are not normally distributed, nor are they distributed in a way where one
+could assume a priori that they are a linear function. Review ratings have a negative skew, and are highly concentrated
+at the ratings 4 and 5. Restaurant ratings also have a negative skew, but since they are a mean of a sample of the 
+previously discussed distribution, they are much more concentrated, with high frequencies for 3 and 4 and negligible 
+frequency for all other values. 
+"""
+# Best results in training from:
