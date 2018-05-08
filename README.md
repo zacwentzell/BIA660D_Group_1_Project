@@ -35,6 +35,9 @@ Open Dataset. Subfolders here are included in .gitignore.
 
 **eda**: Files for preprocessing data and transforming 
 
+**prediction**: Files for predicting Yelp star ratings based on review text and 
+metadata. 
+
 ### Files
 
 **README.md**: This file! Information related to the project and the repository. 
@@ -44,3 +47,14 @@ repository. Important since some of the files we're dealing with contain many
 millions of entries and as a result may be multiple GB in size. The remote Github 
 repository can't handle files of this size, so they must be stored on each group 
 member's local repository. 
+
+Notes 
+-----
+**RE: *Recommendation System/Hoboken_restaurants_reviews_cleaned.csv***: Does not
+vectorize or even properly clean the 'Restaurant Type' data, does not deal with 
+missing values for restaurant price. 
+
+**Known Issues**: Scraped review data has no evaluations of 'Useful', 'Funny', 
+or 'Cool'.
+
+Just let you guys know Recommendation System/Hoboken_restaurants_reviews_cleaned.csv only works for recommendation system part(done two weeks ago). If you really need the vectorized data, there is a normalized one for Neural Network algorithms, which is on path - Recommendation System/Method_4_Deep_Learning(done last week). But I still think all of us should do data preprocessing for different objectives. There is not a perfect dataset for different tasks. - Mani

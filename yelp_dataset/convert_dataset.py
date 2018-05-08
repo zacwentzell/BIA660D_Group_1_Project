@@ -21,6 +21,7 @@ for file_name in file_list:
     df_temp = json_normalize(json_list)
     # os.remove(file_name.replace(".json", ".csv")) # No need
     df_temp.to_csv(file_name.replace(".json", ".csv"), index=False) # Use at end
+    file_in.close()
     print("File saved: "+file_name.replace(".json",".csv"))
 
 print("Done!")

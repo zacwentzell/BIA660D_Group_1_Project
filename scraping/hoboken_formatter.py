@@ -9,7 +9,8 @@ os.chdir('../BIA660D_Group_1_Project')
 from zipfile import ZipFile
 import pandas as pd
 zf = ZipFile("Hoboken_restaurants_reviews.csv.zip")
-validation = pd.read_csv(zf.open('Hoboken_restaurants_reviews.csv'))
+raw = pd.read_csv(zf.open('Hoboken_restaurants_reviews.csv'))
+validation = raw.copy()
 validation = validation.drop(columns=validation.columns.values[0:2]) # Drop index columns
 # Convert user_ratings from string to integer and restaurant ratings from string to float
 validation['user_rating'] = validation['user_rating'].apply(lambda x: int(x[0]))
@@ -43,6 +44,9 @@ def clean_type(types):
     return types # can't be done inplace?
 type_list = type_list.apply(lambda x: clean_type(x))
 all_types = list(set(x for l in type_list for x in l))
+# Now it's clean, lets pause to save
+# validation['restaurant_type'] = type_list
+# validation.to_csv('scraping/hoboken_cleaned.csv', index=False)
 # Alter original DataFrame
 validation = validation.drop(columns=['restaurant_type'])
 # type_df = pd.DataFrame(columns=all_types, index=validation.index)
@@ -63,10 +67,14 @@ validation.loc[:, all_types] = validation.loc[:, all_types].fillna(0)
 # validation.loc[:, all_types].fillna(0, inplace=True) # wasn't working
 # Now EDA, professor reccomends using SVD for the restaurant types
 
-validation.head(3)
+validation.head(2)
+raw.head(2)
 #test
 
-
+#is this really clean?
+clean = pd.read_csv('Recommendation System/Hoboken_restaurants_reviews_cleaned.csv')
+clean.head(2)
+type(clean.loc[0]['restaurant_type']) #is str, should be list w/3  items
 
 # dict_rows = []
 # for row_index in validation.index:
