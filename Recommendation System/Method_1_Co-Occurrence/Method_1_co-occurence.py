@@ -70,6 +70,7 @@ def store_result(co_occurrence_dataset):
     co_occurrence_matrix = get_co_occurrence_matrices(co_occurrence_dataset)
     recommendation_li = []
     for i in range(len(co_occurrence_dataset)):
+        # top_n = 3 according to the target of the project
         recommendation_for_user = get_co_occurrence_result(co_occurrence_dataset,
                                                            user_id=co_occurrence_dataset.user_id[i], top_n=3)
         recommendation_li.append(recommendation_for_user)
