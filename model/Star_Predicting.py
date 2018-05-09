@@ -1,25 +1,30 @@
+#By Xin Lin
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import time
-import lightgbm as lgb
+
 import os
 import psutil
 import gc
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score
-from sklearn import metrics
-from sklearn.metrics import roc_auc_score
-from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import LinearSVC
+
 from sklearn.model_selection import GridSearchCV
+
+from sklearn.ensemble import RandomForestRegressor
+
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error as mse
+
 
 def cpuStats():
     pid = os.getpid()
     py = psutil.Process(pid)
     memoryUse = py.memory_info()[0] / 2. ** 30
     print('memory GB:', memoryUse)
+
+
+
 
 
 
@@ -43,6 +48,8 @@ tmp = df[['business_id','city','Restaurant_Star']].drop_duplicates()
 
 
 print('Adding Restaurant_Number....')
+
+
 gp = tmp.groupby(['city'])['business_id'].count().reset_index().rename(index=str, columns={'business_id':'Restaurant_Number' })
 df = df.merge(gp,on = 'city')
 del gp
@@ -69,6 +76,10 @@ df = df.merge(tmp,on='user_id')
 
 del tmp
 gc.collect()
+
+
+
+
 print('Adding Num_of_Useful_User_Get....')
 tmp = df.groupby('user_id')['useful'].sum().reset_index(). \
 rename(index=str, columns={'useful':'Num_of_Useful_User_Get'})
@@ -77,6 +88,21 @@ df = df.merge(tmp,on='user_id')
 
 del tmp
 gc.collect()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 print('Adding Num_of_Cool_User_Get....')
 tmp = df.groupby('user_id')['cool'].sum().reset_index(). \
 rename(index=str, columns={'cool':'Num_of_Cool_User_Get'})
@@ -85,6 +111,13 @@ df = df.merge(tmp,on='user_id')
 
 del tmp
 gc.collect()
+
+
+
+
+
+
+
 print('Adding Num_of_Funny_User_Get....')
 tmp = df.groupby('user_id')['funny'].sum().reset_index(). \
 rename(index=str, columns={'funny':'Num_of_Funny_User_Get'})
@@ -93,6 +126,11 @@ df = df.merge(tmp,on='user_id')
 
 del tmp
 gc.collect()
+
+
+
+
+
 print('Adding User_Mean_Star....')
 tmp = df.groupby('user_id')['Review_Star'].mean().reset_index(). \
 rename(index=str, columns={'Review_Star':'User_Mean_Star'})
@@ -100,6 +138,20 @@ rename(index=str, columns={'Review_Star':'User_Mean_Star'})
 df = df.merge(tmp,on='user_id')
 
 del tmp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 gc.collect()
 
 df.drop(['business_id','user_id','name','funny','useful','cool','date'],axis=1,inplace=True)
@@ -130,24 +182,63 @@ print('Valid size:', len(val_df))
 print('Train y size:', len(y_train))
 print('Valid y size:', len(y_val))
 
+features = list(train_df.columns)
+
 gc.collect()
 
+print(train_df.columns)
 print('Training...')
 cpuStats()
-rf = RandomForestClassifier(n_estimators=800,max_depth=8).fit(train_df, y_train)
-y_val_1 = rf.predict(val_df)
+rf = RandomForestRegressor(n_estimators=800,max_depth=8,n_jobs=-1).fit(train_df, y_train)
+rf_pre = rf.predict(val_df)
+rf_mse = mse(rf_pre,y_val)
+print('mse for randomforest:',rf_mse)
+print ("Features sorted by their score:")
+print (sorted(zip(map(lambda x: round(x, 4), rf.feature_importances_), features),
+             reverse=True))
 
-print("Random Forest Validation accuracy: ", sum(y_val_1 == y_val) / len(y_val))
-# print('Tuning...')
-# rf = RandomForestClassifier()
-# param_grid = {
-#     'n_estimators': [200,800],
-#     # 'max_features': ['auto', 'sqrt', 'log2'],
-#     'max_depth' : [4,8],
-#     # 'criterion' :['gini', 'entropy']
-# }
 #
-# clf = GridSearchCV(rf, param_grid,cv=5)
-# clf.fit(df, y)
-# print (clf.best_params_)
+# svr = SVR().fit(train_df, y_train)
+# svr_pre = svr.predict(val_df)
+# svr_mse = mse(svr_pre,y_val)
+# print('mse for svr:', svr_mse)
+#
+#
+lr = LinearRegression(n_jobs=-1).fit(train_df,y_train)
+lr_pre = lr.predict(val_df)
+lr_mse = mse(lr_pre,y_val)
+print('mse for linear regression:',lr_mse)
+
+blend = (rf_pre + lr_pre)/2
+
+blend_mse = mse(blend,y_val)
+print('mse after blending:',blend_mse)
+
+# importance = rf.feature_importances_
+# importance = pd.DataFrame(importance, index=train_df.columns,
+#                           columns=["Importance"])
+
+# importance["Std"] = np.std([tree.feature_importances_
+#                             for tree in rf.estimators_], axis=0)
+
+# x = range(importance.shape[0])
+# y = importance.ix[:, 0]
+# yerr = importance.ix[:, 1]
+
+# plt.bar(x, y, yerr=yerr, align="center")
+
+# plt.show()
+
+print('Tuning...')
+rf = RandomForestClassifier()
+param_grid = {
+    'n_estimators': [200,800,1000],
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'max_depth' : [4,8,12],
+    'criterion' :['gini', 'entropy']
+}
+
+clf = GridSearchCV(rf, param_grid,cv=5)
+clf.fit(df, y)
+print (clf.best_params_)
 print('Time used',time.time()-tm,'s')

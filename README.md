@@ -33,10 +33,12 @@ Folder and File Info
 **yelp_dataset**: Files for formatting and storing the data provided in the Yelp
 Open Dataset. Subfolders here are included in .gitignore. 
 
-**eda**: Files for preprocessing data and transforming 
+**eda**: Files for preprocessing data and transforming (preliminary ones, other
+files involving EDA can be found in the *prediction* folder as models are 
+iterated through)
 
 **prediction**: Files for predicting Yelp star ratings based on review text and 
-metadata. 
+metadata. Also additional EDA throughout iteration through models. 
 
 ### Files
 
@@ -50,6 +52,9 @@ member's local repository.
 
 Notes 
 -----
+Not all documentation for functions is found in the README files, some is included
+within the code (.py or .ipynb) using single or multiline comments. 
+
 **RE: *Recommendation System/Hoboken_restaurants_reviews_cleaned.csv***: Does not
 vectorize or even properly clean the 'Restaurant Type' data, does not deal with 
 missing values for restaurant price. 

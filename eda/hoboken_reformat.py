@@ -17,7 +17,7 @@ restaurant_list = hoboken_raw['restaurant_name'].unique()
 for restaurant in restaurant_list: # warning: Takes a LONG time
     review_indexes = hoboken_raw.loc[hoboken_raw['restaurant_name'] == restaurant].index
     review_count = len(review_indexes)
-    superscore = review_count * hoboken_raw.iloc[review_indexes[0]]['restaurant_rating']
+    superscore = review_count * hoboken_raw.iloc[review_indexes[0]]['restaurant_rating'] #could be improved
     for i in review_indexes:
         review = hoboken_raw.iloc[i]
         review.loc['restaurant_rating'] = (superscore - review['user_rating']) / (review_count - 1)
