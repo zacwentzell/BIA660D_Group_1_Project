@@ -44,51 +44,56 @@ def get_recommendation_df(model, X_test):
     recommendation_df = pd.DataFrame({'restaurant_name':model.classes_,'probability':probability[0]})
     return recommendation_df
 
-def get_output(top_n, y_test,recommendation_df):
-    top_n = recommendation_df[recommendation_df.restaurant_name != y_test].sort_values(by='probability', ascending=False).head(top_n)
-    recommendation_li = []
-    for i in range(len(top_n)):
-        recommendation_item = list(top_n.iloc[i,:])
-        recommendation_li.append(recommendation_item)
-    output = str(recommendation_li).replace('[','')
-    output = output.replace(']','')
-    return output
 
-def store_the_recommendation(X_train, y_train,nn_df, top_n, nn):
+def get_output(top_n, y_test,recommendation_df):
+    top_n_df = recommendation_df[recommendation_df.restaurant_name != y_test].sort_values(by='probability', ascending=False).head(top_n)
+
+    recommend_restaurant = list(top_n_df.loc[:,'restaurant_name'])
+    recommend_score = list(top_n_df.loc[:,'probability'])
+    recommendation_li = []
+    for i in range(len(recommend_restaurant)):
+        rank_restaurant_score = [str(i+1), recommend_restaurant[i], recommend_score[i]]
+        recommendation_li.append(rank_restaurant_score)
+    return recommendation_li
+
+def store_the_recommendation(X_train, y_train,nn_df, top_n, nn_best):
     export_df = pd.DataFrame(nn_df.user_id)
     recommendation_li = []
     for i in range(len(X_train)):
         X_test = np.asarray(X_train.iloc[i, :])
         X_test = X_test.reshape(-1, 1).T
         y_test = y_train.iloc[i]
-        recommendation_df = get_recommendation_df(nn, X_test)
+        recommendation_df = get_recommendation_df(nn_best, X_test)
         output = get_output(top_n, y_test, recommendation_df)
         recommendation_li.append(output)
+        print(i)
     export_df['Recommendation'] = recommendation_li
     export_df.to_csv('Neural_Network_result.csv', index=False)
     return None
 
 def main():
     df = pd.read_csv('Hoboken_restaurants_reviews_cleaned.csv')
-    nn_df = df[['user_id','restaurant_name','user_rating','restaurant_rating','restaurant_price','restaurant_type']]
-    nn_df = nn_df.dropna()
-
+    nn_df = df[
+        ['user_id', 'restaurant_name', 'user_rating', 'restaurant_rating', 'restaurant_price', 'restaurant_type']]
     variable_names = ['user_rating', 'restaurant_rating', 'restaurant_price']
-
-    norm_result = normalize_variable(nn_df,variable_names)
+    norm_result = normalize_variable(nn_df, variable_names)
 
     tfidf_m, tfidf_d = get_tf(nn_df['restaurant_type'], idf=True, max_df=0.5, min_df=10)
 
     df = get_nn_df(nn_df, norm_result, tfidf_d, variable_names)
+    df.to_csv('normalized_neural_network_dataset.csv')
 
-    X_train = df.iloc[:,:-1]
+    X_train = df.iloc[:, :-1]
     y_train = df.output
 
-    nn= MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(16, 3), random_state=1)
+    nn = MLPClassifier(solver='adam', alpha=1e-5, hidden_layer_sizes=(25, 6), random_state=1, learning_rate='adaptive', learning_rate_init= 0.005,
+                       max_iter=1000)
     nn = nn.fit(X_train, y_train)
 
     top_n = 3
-    store_the_recommendation(X_train, y_train ,nn_df, top_n, nn)
+
+    store_the_recommendation(X_train, y_train, nn_df, top_n, nn)
+
 
 if __name__ == '__main__':
     main()
