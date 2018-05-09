@@ -52,6 +52,9 @@ member's local repository.
 
 Notes 
 -----
+Not all documentation for functions is found in the README files, some is included
+within the code (.py or .ipynb) using single or multiline comments. 
+
 **RE: *Recommendation System/Hoboken_restaurants_reviews_cleaned.csv***: Does not
 vectorize or even properly clean the 'Restaurant Type' data, does not deal with 
 missing values for restaurant price. 

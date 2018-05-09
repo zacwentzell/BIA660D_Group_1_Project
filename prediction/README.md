@@ -18,6 +18,16 @@ using the bag-of-words technique.
 **bagofwords.ipynb**: iPython Notebook demonstrating the steps and results of 
 *bagofwords.py*.
 
+**features.py**: Additional EDA and feature creation/selection. The EDA and 
+feature manipulation files throughout this project have been broken up into
+multiple files and saved multiple times as CSVs because the running time for 
+each tends to be quite long so multiple files and CSVs allow for checkpoints
+to save progress. This is useful in the event of a crash or similar situation. 
+
+**features.ipynb**: Graphical representation of *features.py*, useful for 
+visualizing any sort of relationship or correlation (not necessarily 
+linear) between potential features/predictive variables and the output.
+
 Details
 --------------------
 *bagofwords* files (.py, .csv, .ipynb) include preliminary modeling as well as

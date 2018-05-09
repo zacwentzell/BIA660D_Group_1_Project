@@ -253,7 +253,7 @@ def concat_dataset():
 
 def main():
     driver = open_website('https://www.yelp.com/')
-    driver = select_location_business(driver, '07030', 'Restaurant')
+    driver = select_location_business(driver, '07030', 'Restaurant') #yelp.com/search?find_desc=Restaurants&find_loc=07030
     driver = select_back_all_re(driver)
     fix_error(error_li)
     concat_dataset()
