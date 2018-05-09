@@ -49,13 +49,36 @@ import re, string
 apostrophes = re.compile("'")
 punctuation = re.compile('[%s]' % re.escape(string.punctuation))# all punctuation marks, but not escape characters i.e \n
 multiple_spaces = re.compile(' +')
-# Custom mispelling identifiers #nltk.download('brown')
-from nltk.corpus import brown
-word_list = brown.words()
-word_list_lower = map(lambda x: x.lower(), word_list)
-word_set = set(word_list_lower) #takes few seconds
+# Custom mispelling identifiers #nltk.download('brown'), etc.
 #pyenchant spell checker doesn't work for non 2.x python on systems other than Linux
-from textblob import TextBlob
+# from textblob import TextBlob #nope, errors like restauraunts -> restaurant and Grand Vin -> Grand In
+from nltk.corpus import brown, gutenberg, reuters, cmudict
+# do not use: stopwords, conll2002, these include non-english words
+corpuses = [brown, gutenberg, reuters, cmudict]
+all_word_list = set()
+for corp in corpuses:
+    all_word_list = all_word_list.union(set(map(lambda x: x.lower(), corp.words())))
+len(all_word_list)
+
+brown_set =  set(map(lambda x: x.lower(), brown.words())) #these all take a few seconds
+gutenberg_set = set(map(lambda x: x.lower(), gutenberg.words()))
+reuters_set = set(map(lambda x: x.lower(), reuters.words()))
+
+# import nltk
+nltk.download('conll2002')
+from nltk.corpus import conll2002
+conll2002.words()
+len(set(conll2002.words()))
+# len(set(map(lambda x: x.lower(), cmudict.words())))
+
+#
+#
+len(reuters_set) #31078
+set_a = reuters_set.union(brown_set)
+len(set_a)
+len(reuters_set | brown_set | gutenberg_set)
+len(brown_set) #49815
+len(gutenberg_set) #42339
 #
 def correctly_spelled(word):
     if all([letter.isdigit() for letter in word]):
