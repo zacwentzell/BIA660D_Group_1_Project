@@ -113,29 +113,33 @@ def count_mispellings(text): #text = temp #for testing #takes ages for all words
 # count_mispellings(data['user_text'][2])
 # i could do it by chunk?
 
-len(data['user_text'])
+len(data['user_text']) #74611
 # data['user_text'] #[:15000] #[15000:30000] # [30000:45000] # [45000:60000] # [60000:]
 # first_1500 = data['user_text'][:1500].apply(count_mispellings) #careful this takes ages #15 minutes this is taking  #86.25s
 # second_1500 = data['user_text'][1500:3000].apply(count_mispellings)
 # third_1500 = data['user_text'][3000:4500].apply(count_mispellings) #141s (i dont believe it, it took much longer than that
 # fourth_1500 = data['user_text'][4500:6000].apply(count_mispellings)#pd.Series
 # fifth_1500 = data['user_text'][6000:].apply(count_mispellings)  #wait its not 7400 in size its 74,000... will take much longer
-import time
+import time #estimated time based on previous averages is roughly: 82.9 minutes, lets see how long it actually takes
 start = time.time()
-data['mispelling_count'] = data['user_text'].apply(count_mispellings) #careful this takes ages #15 minutes this is taking
+data['mispelling_count'] = data['user_text'].apply(count_mispellings) #careful this takes ages #started at 11:14 end at
 end = time.time()
-print("Process took "+str(end-start)+"s to finish")
+print("Process took "+str(end-start)+"s to finish") # 6092.65s =  101.5m
 # count_series = pd.Series(name='mispelling_count')
 # [first_1500, second_1500, third_1500, fourth_1500, fifth_1500]
 # data['user_text'][1498:1502]
 # count_series[1498:1502]
 
 mispelling_to_ratings = data[['mispelling_count', 'user_rating']]
-#
+
+data.head(2)
+# data['mispelling_count']
 # text = data['user_text'][23] #for testing
 # Save data so we don't have to calculate mispellings, review_len, etc. again (can always remove easily, but takes
 # time and effort to create from scratch. Thus we save it below \/
-data.to_csv('../BIA660D_Group_1_Project/eda/hoboken_step2.csv')
+data.to_csv('../BIA660D_Group_1_Project/eda/hoboken_step2.csv', index = False) #yay!
+# data.drop(columns=[data.columns[0]], inplace=True)
+# data.head(3)
 #
 """
 Some thoughts: maybe I should have kept in the user names for each reviewer so I could count all reviews they left in 
