@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 def get_train_test(file_name):
     df = pd.read_csv(file_name)
-    train_data, test_data = train_test_split(df, test_size=0.25)
+    train_data, test_data = train_test_split(df, test_size=0.2)
     train_data_gl = graphlab.SFrame(train_data)
     test_data_gl = graphlab.SFrame(test_data)
     return train_data_gl, test_data_gl
