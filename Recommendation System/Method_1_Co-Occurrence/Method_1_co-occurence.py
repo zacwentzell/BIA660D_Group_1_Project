@@ -84,7 +84,7 @@ def store_result(co_occurrence_dataset):
     # second column
     df['recommendation'] = recommendation_li
     # save
-    df.to_csv('co_occurence_result.csv', index=False)
+    df.to_csv('co_occurrence_result.csv', index=False)
     return None
 
 def main():
