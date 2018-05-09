@@ -52,41 +52,41 @@ multiple_spaces = re.compile(' +')
 # Custom mispelling identifiers #nltk.download('brown'), etc.
 #pyenchant spell checker doesn't work for non 2.x python on systems other than Linux
 # from textblob import TextBlob #nope, errors like restauraunts -> restaurant and Grand Vin -> Grand In
-from nltk.corpus import brown, gutenberg, reuters, cmudict
-# do not use: stopwords, conll2002, these include non-english words
-corpuses = [brown, gutenberg, reuters, cmudict]
-all_word_list = set()
-for corp in corpuses:
+from nltk.corpus import brown, gutenberg, reuters, masc_tagged, movie_reviews, treebank, \
+    opinion_lexicon, product_reviews_2, pros_cons, subjectivity, sentence_polarity, words
+# do not use: stopwords, conll2002, jeita, knbc, alpino, sinica_treebank, udhr, udhr2, these include non-english words
+# had weird or foreign or slang terms, oomlouts, etc: wordnet, cmudict, genesis
+corpuses = [brown, gutenberg, reuters, masc_tagged, movie_reviews, treebank, opinion_lexicon, product_reviews_2,
+            pros_cons, subjectivity, sentence_polarity, words]
+all_word_list = set() #best maybe: words,
+for counter, corp in enumerate(corpuses, 1):
+    print("Appending corpus #"+str(counter)+" of "+str(len(corpuses))+" to set of all words. ")
     all_word_list = all_word_list.union(set(map(lambda x: x.lower(), corp.words())))
+### Check where the incorrect words are coming from, to remove that source from the corpuses
+backup = all_word_list.copy()
+# for counter, corp in enumerate(corpuses, 1):
+#     if 'jafef' in map(lambda x: x.lower(), corp.words()):
+#         print(counter, corp)#         break
 len(all_word_list)
-
-brown_set =  set(map(lambda x: x.lower(), brown.words())) #these all take a few seconds
-gutenberg_set = set(map(lambda x: x.lower(), gutenberg.words()))
-reuters_set = set(map(lambda x: x.lower(), reuters.words()))
-
-# import nltk
-nltk.download('conll2002')
-from nltk.corpus import conll2002
-conll2002.words()
-len(set(conll2002.words()))
-# len(set(map(lambda x: x.lower(), cmudict.words())))
-
-#
-#
-len(reuters_set) #31078
-set_a = reuters_set.union(brown_set)
-len(set_a)
-len(reuters_set | brown_set | gutenberg_set)
-len(brown_set) #49815
-len(gutenberg_set) #42339
-#
+# brown_set =  set(map(lambda x: x.lower(), brown.words())) #these all take a few seconds
+# gutenberg_set = set(map(lambda x: x.lower(), gutenberg.words()))
+# reuters_set = set(map(lambda x: x.lower(), reuters.words()))
+# import hunspell #nope
+# help(hunspell)
+# hobj = hunspell.hunspell('/usr/share/hunspell/en_US.dic')
+# len(reuters_set) #31078
+# len(reuters_set | brown_set | gutenberg_set)
+# len(brown_set) #49815
+# len(gutenberg_set) #42339
+# #
 def correctly_spelled(word):
     if all([letter.isdigit() for letter in word]):
         return( True )
     # result = (word.lower() == spell(word).lower()) #autocorrect version
-    result = (word in word_set) #brown corpus
-    result =
-
+    # result = (word in word_set) #brown corpus
+    result = (word.lower() in all_word_list)
+    if not result:
+        result = (word.lower() == spell(word).lower()) #I think this one takes longest, so I did it in the 'if'
     return( result )
 def strip_punct(text):
     text = apostrophes.sub('', text) # To prevent seperating "wouldn't" into "wouldn t"
@@ -110,10 +110,29 @@ def count_mispellings(text): #text = temp #for testing #takes ages for all words
                 mispellings += 1
     return mispellings
 # ^ lol a simple concept but these took quite a while to code to make them robust # data_copy = data.copy(deep=True)
-data['mispelling_count'] = data['user_text'].apply(count_mispellings) #careful this takes ages
+# count_mispellings(data['user_text'][2])
+# i could do it by chunk?
+
+len(data['user_text'])
+# data['user_text'] #[:15000] #[15000:30000] # [30000:45000] # [45000:60000] # [60000:]
+# first_1500 = data['user_text'][:1500].apply(count_mispellings) #careful this takes ages #15 minutes this is taking  #86.25s
+# second_1500 = data['user_text'][1500:3000].apply(count_mispellings)
+# third_1500 = data['user_text'][3000:4500].apply(count_mispellings) #141s (i dont believe it, it took much longer than that
+# fourth_1500 = data['user_text'][4500:6000].apply(count_mispellings)#pd.Series
+# fifth_1500 = data['user_text'][6000:].apply(count_mispellings)  #wait its not 7400 in size its 74,000... will take much longer
+import time
+start = time.time()
+data['mispelling_count'] = data['user_text'].apply(count_mispellings) #careful this takes ages #15 minutes this is taking
+end = time.time()
+print("Process took "+str(end-start)+"s to finish")
+# count_series = pd.Series(name='mispelling_count')
+# [first_1500, second_1500, third_1500, fourth_1500, fifth_1500]
+# data['user_text'][1498:1502]
+# count_series[1498:1502]
+
 mispelling_to_ratings = data[['mispelling_count', 'user_rating']]
 #
-text = data['user_text'][23] #for testing
+# text = data['user_text'][23] #for testing
 # Save data so we don't have to calculate mispellings, review_len, etc. again (can always remove easily, but takes
 # time and effort to create from scratch. Thus we save it below \/
 data.to_csv('../BIA660D_Group_1_Project/eda/hoboken_step2.csv')
